@@ -66,6 +66,7 @@ def parse_pyfile(content):
         if line.startswith('def'):
             func_name = line.split()[1].split('(')[0]
             #func_name = line.strip('def').strip().strip(':')
+            
             # move to next line
             i += 1
             in_func_scope = True
@@ -130,12 +131,9 @@ with open('README.md', 'w') as mdfile:
         write_content.append(module_name)
         write_content.append('------')
         write_content.append('| Function | Description |')
-        write_content.append('| -------- | ----------- |')
+        write_content.append('| :------- | :---------- |')
         
         for func_name, func_doc in sub_dict.items():
-            #write_content.append(' - ' + func_name)
-            #write_content.append('>' + func_doc)
-            #write_content.append(f'| {func_name} | {func_doc} |')
             write_content.append(f'| <font color="#a77864"> **{func_name}** </font> | {func_doc} |')
         
         write_content.append('\n')
