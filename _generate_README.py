@@ -126,7 +126,7 @@ for pyfname in pyfilenames:
 ###  
     
 with open('README.md', 'w') as mdfile:
-    write_content = []
+    write_content = ['# hurricane_tools']
     for module_name, sub_dict in module_dict.items():
         write_content.append(module_name)
         write_content.append('------')
