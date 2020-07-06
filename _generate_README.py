@@ -114,6 +114,8 @@ def parse_pyfile(content):
 module_dict = {}    # key: .py filename, value: dictionary with key is function name and value is function docstring
 
 pyfilenames = [f for f in os.listdir('./') if f.endswith('py') and not f.startswith('_')]
+pyfilenames = sorted(pyfilenames)
+
 for pyfname in pyfilenames:
     with open(pyfname, 'r') as pyf_content:
         content = pyf_content.readlines()
