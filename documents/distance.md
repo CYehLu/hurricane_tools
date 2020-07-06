@@ -1,10 +1,12 @@
 # distance.py
-latlon2distance(lon1, lat1, lon2, lat2)
+<span style="color:#a77864">**latlon2distance**</span>**(lon1, lat1, lon2, lat2)**
+
 calculate the distance (km) of two positions
 
 
 ******
-find_lonlat_with_distance(clon, clat, distance, xy)
+<span style="color:#a77864">**find_lonlat_with_distance**</span>**(clon, clat, distance, xy)**
+
     Find the longtitude/latitude which the horizontal or vertical distance
     to the (clon, clat) is equal to 'distance'.
     

@@ -186,7 +186,10 @@ for pyfname in pyfilenames:
         write_content = [f'# {pyfname}']
         
         for func_name_args, doc in module_dict['fulldoc'][pyfname].values():
-            write_content.append(func_name_args)
+            # e.g func_name_args = 'func1(arg1, arg2, arg3)'
+            name = func_name_args.split('(')[0]
+            args = '(' + func_name_args.split('(')[1]
+            write_content.append(f'<span style="color:#a77864">**{name}**</span>**{args}**\n')
             write_content.append(doc)
             write_content.append('\n')
             write_content.append('******')

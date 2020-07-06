@@ -1,5 +1,6 @@
 # circular.py
-circular_avg(lon, lat, values, clon, clat, radius, dxdy=None, **kwargs)
+<span style="color:#a77864">**circular_avg**</span>**(lon, lat, values, clon, clat, radius, dxdy=None, **kwargs)**
+
     Calculate circular mean.
     
     Parameters:
@@ -48,7 +49,8 @@ circular_avg(lon, lat, values, clon, clat, radius, dxdy=None, **kwargs)
 
 
 ******
-circular_avg_closure(lon, lat, clon, clat, radius, dxdy=None, **kwargs)
+<span style="color:#a77864">**circular_avg_closure**</span>**(lon, lat, clon, clat, radius, dxdy=None, **kwargs)**
+
     Calculate circular mean.
     
     This function is very similar to `circular_avg`, while this function returns
@@ -67,7 +69,8 @@ circular_avg_closure(lon, lat, clon, clat, radius, dxdy=None, **kwargs)
 
 
 ******
-rmw(lon, lat, ws, clon, clat, maxdist=550, box=True, **kwargs)
+<span style="color:#a77864">**rmw**</span>**(lon, lat, ws, clon, clat, maxdist=550, box=True, **kwargs)**
+
     Find TC RMW
     
     Paramters
@@ -100,7 +103,8 @@ rmw(lon, lat, ws, clon, clat, maxdist=550, box=True, **kwargs)
 
 
 ******
-axissymmetricity(lon, lat, var, radius, clon, clat, dxdy=None, integ='trapz', **kwargs)
+<span style="color:#a77864">**axissymmetricity**</span>**(lon, lat, var, radius, clon, clat, dxdy=None, integ='trapz', **kwargs)**
+
     Calculate axissymmetricity based on Miyamoto and Takemi (2013).
     
     Parameter:

@@ -60,18 +60,6 @@ parse_wrf_center_mesg.py
 
 
 ******
-test.py
-------
-[document](./documents/test.md) 
-
-| Function | Description |
-| :------- | :---------- |
-| <font color="#a77864"> **parse_one_line_doc** </font> | tri_quote = '"""' |
-| <font color="#a77864"> **parse_multi_line_doc** </font> | tri_quote = '"""' |
-| <font color="#a77864"> **parse_pyfile** </font> | tri_quote = '"""' |
-
-
-******
 transform.py
 ------
 [document](./documents/transform.md) 

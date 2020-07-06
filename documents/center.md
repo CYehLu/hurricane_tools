@@ -1,5 +1,6 @@
 # center.py
-ty_center_mslp(lon, lat, slp)
+<span style="color:#a77864">**ty_center_mslp**</span>**(lon, lat, slp)**
+
     Find typhoon center by minimum sea level pressure grid (no weighted).
     
     Parameter
@@ -16,7 +17,8 @@ ty_center_mslp(lon, lat, slp)
 
 
 ******
-weighted_ty_center(lon, lat, center_lon, center_lat, var, latlon_range=1)
+<span style="color:#a77864">**weighted_ty_center**</span>**(lon, lat, center_lon, center_lat, var, latlon_range=1)**
+
     Giving first guess typhoon center longtitude and latitude, calculate the 
     new center by weighted mothod.
     

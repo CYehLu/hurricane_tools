@@ -1,5 +1,6 @@
 # parse_wrf_center_mesg.py
-parse_wrf_rsl_error(wrfrun_path)
+<span style="color:#a77864">**parse_wrf_rsl_error**</span>**(wrfrun_path)**
+
     Parse `rsl.error.0000` outputed from WRF to get the center information.
     If parse file successfully, it would create `center.txt` in the current
     folder.
@@ -12,7 +13,8 @@ parse_wrf_rsl_error(wrfrun_path)
 
 
 ******
-find_centers_nearest_time(filename, target_dates, formats=None)
+<span style="color:#a77864">**find_centers_nearest_time**</span>**(filename, target_dates, formats=None)**
+
     Find the hurricane center data at specific times from the file
     which contains center information based on WRF rsl.error.0000.
     

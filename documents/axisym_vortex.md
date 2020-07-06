@@ -1,5 +1,6 @@
 # axisym_vortex.py
-rankine_vortex(r, vmax, rmax, alpha=1)
+<span style="color:#a77864">**rankine_vortex**</span>**(r, vmax, rmax, alpha=1)**
+
     Classic rankine vortex.
     
     V(r) = |- Vmax * (r / Rmax) ,       if r <= Rmax
@@ -24,7 +25,8 @@ rankine_vortex(r, vmax, rmax, alpha=1)
 
 
 ******
-holland80(r, pc, pn, A, B, rho=None, f=None)
+<span style="color:#a77864">**holland80**</span>**(r, pc, pn, A, B, rho=None, f=None)**
+
     The empirical formula of TC axisymmetric structure by Holland (1980).
     
     Follow this profile:
@@ -59,7 +61,8 @@ holland80(r, pc, pn, A, B, rho=None, f=None)
 
 
 ******
-willoughby04(r, vmax, rmax, n, X1, X2, A, twidth)
+<span style="color:#a77864">**willoughby04**</span>**(r, vmax, rmax, n, X1, X2, A, twidth)**
+
     The empirical formula of TC axisymmetric structure by Willoughby (2006).
     
     Reference:
