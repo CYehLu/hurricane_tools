@@ -25,7 +25,7 @@ circular.py
 | <font color="#a77864"> **circular_avg** </font> | Calculate circular mean. |
 | <font color="#a77864"> **circular_avg_closure** </font> | Calculate circular mean. |
 | <font color="#a77864"> **rmw** </font> | Find TC RMW |
-| <font color="#a77864"> **axissymmetricity** </font> | var: shape=(ny, nx) radius: shape=(nr,) |
+| <font color="#a77864"> **axissymmetricity** </font> | Calculate axissymmetricity based on Miyamoto and Takemi (2013). |
 
 
 ******
@@ -51,8 +51,8 @@ transform.py
 ------
 | Function | Description |
 | :------- | :---------- |
-| <font color="#a77864"> **uv2vrvt_rt** </font> | u, v: (ny, nx) -> vr, vt: (nradius, ntheta) |
-| <font color="#a77864"> **uv2vrvt_xy** </font> | u, v: (ny, nx) -> vr, vt: (ny, nx) |
+| <font color="#a77864"> **uv2vrvt_rt** </font> | Calculate Vr (radial wind) and Vt (tangential wind) on r-theta coordinate (polar coordinate). |
+| <font color="#a77864"> **uv2vrvt_xy** </font> | Calculate Vr (radial wind) and Vt (tangential wind) on cartesian coordinate. |
 
 
 ******

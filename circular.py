@@ -18,7 +18,7 @@ def circular_avg(lon, lat, values, clon, clat, radius, dxdy=None, **kwargs):
     clon, clat: scaler
         The center coordinates of circular mean.
     radius: scaler or 1-d array-like
-        The radius of circle. Unit is km.
+        The radius of circles. Unit is km.
     dxdy: 2-elements tuple, (dx, dy). Optional
         Spatial resolution. 
         Default is None, and it would automatically derive dx and dy besed on `lon`
@@ -292,8 +292,40 @@ def rmw(lon, lat, ws, clon, clat, maxdist=550, box=True, **kwargs):
 
 def axissymmetricity(lon, lat, var, radius, clon, clat, dxdy=None, integ='trapz', **kwargs):
     """
-    var: shape=(ny, nx)
-    radius: shape=(nr,)
+    Calculate axissymmetricity based on Miyamoto and Takemi (2013).
+    
+    Parameter:
+    ---------
+    lon, lat : 2d array, shape = (ny, nx)
+        Longtitude / latitude
+    var : 2d array, shape = (ny, nx)
+        The variable used in the calculation of axissymmetricity, e.g: wind speed.
+    radius : 1d array, shape = (nr,)
+        The radius of circles. Unit is km.
+    clon, clat: scaler
+        The center longtitude / latitude of TC.
+    dxdy : 2 element tuple, (dx, dy).
+        Spatial resolution. Default is None, and it would find the dx and dy automatically
+        based on `lon` and `lat`.
+    integ : str, {'trapz', 'simps'}.
+        Numerical integration method. 'trapz' is trapezoidal method, and `simps` is Simpson’s
+        method. 
+        See scipy document: https://reurl.cc/X6KpYD
+    **kwargs : method, fill_value, rescale
+        The parameters used in scipy.interpolate.griddata.
+        Check document for griddata:
+        https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html
+        
+    Return:
+    ------
+    1d array with shape = (nr,). The axisymmetricity at the given radius.
+    
+    Reference
+    ---------
+    [1] Yoshiaki Miyamoto and Tetsuya Takemi: "A Transition Mechanism for the Spontaneous 
+        Axisymmetric Intensification of Tropical Cyclones"
+        J. Atmos. Sci, 70, 112-129
+        https://doi.org/10.1175/JAS-D-11-0285.1
     """
     if dxdy is None:
         dx = latlon2distance(lon[0,0], lat[0,0], lon[0,1], lat[0,0])
