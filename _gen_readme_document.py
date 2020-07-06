@@ -182,7 +182,7 @@ with open('README.md', 'w') as mdfile:
 
 module_dict['description']
 for pyfname in pyfilenames:
-    with open(f'./documents/{pyfname.strip(".py")}.md', 'w') as mdfile:
+    with open(f'./documents/{pyfname.rstrip(".py")}.md', 'w') as mdfile:
         write_content = [f'# {pyfname}']
         
         for func_name_args, doc in module_dict['fulldoc'][pyfname].values():
