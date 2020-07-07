@@ -103,9 +103,9 @@
 
 
 ******
-<span style="color:#a77864">**axissymmetricity**</span>**(lon, lat, var, radius, clon, clat, dxdy=None, integ='trapz', **kwargs)**
+<span style="color:#a77864">**axisymmetricity**</span>**(lon, lat, var, radius, clon, clat, dxdy=None, integ='trapz', **kwargs)**
 
-    Calculate axissymmetricity based on Miyamoto and Takemi (2013).
+    Calculate axisymmetricity based on Miyamoto and Takemi (2013).
     
     Parameter:
     ---------

@@ -34,7 +34,7 @@ circular.py
 | <font color="#a77864"> **circular_avg** </font> | Calculate circular mean. |
 | <font color="#a77864"> **circular_avg_closure** </font> | Calculate circular mean. |
 | <font color="#a77864"> **rmw** </font> | Find TC RMW |
-| <font color="#a77864"> **axissymmetricity** </font> | Calculate axissymmetricity based on Miyamoto and Takemi (2013). |
+| <font color="#a77864"> **axisymmetricity** </font> | Calculate axisymmetricity based on Miyamoto and Takemi (2013). |
 
 
 ******
