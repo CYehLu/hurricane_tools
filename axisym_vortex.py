@@ -2,8 +2,6 @@ import numpy as np
 from scipy.optimize import root
 
 
-from scipy.optimize import root
-
 def rankine_vortex(r, vmax, rmax, alpha=1):
     """
     Classic rankine vortex.
@@ -17,7 +15,7 @@ def rankine_vortex(r, vmax, rmax, alpha=1):
     r : scalar, 1-d array-like or 2-d array-like
         Radius
     vmax : scalar
-        The maximum tangent wind speed.
+        The maximum tangential wind speed.
     rmax : scalar
         The radius of maximum wind speed.
     alpha : scalar, optional
@@ -26,6 +24,7 @@ def rankine_vortex(r, vmax, rmax, alpha=1):
     Return:
     ------
     V : scalar, 1-d array-like or 2-d array-like
+        Tangential wind speed.
     """
     if isinstance(r, (int, float)):
         r = np.array([r])
@@ -65,7 +64,8 @@ def holland80(r, pc, pn, A, B, rho=None, f=None):
     Return:
     ------
     V : scalar, 1-d array-like or 2-d array-like
-    
+        Tangential wind speed.
+        
     Reference:
     ---------
     [1] G. J. Holland, "An Analytic Model of the Wind and Pressure Profiles in Hurricanes"

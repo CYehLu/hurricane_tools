@@ -44,7 +44,10 @@ def circular_avg(lon, lat, values, clon, clat, radius, dxdy=None, **kwargs):
             
     Returns:
     -------
-    circular average result, 1-d array with size=len(radius).
+    If `return_interp` is False (default option):
+        Circular average result, 1-d array with size=len(radius).
+    If `return_interp` is True:
+        See `return_interp` argument interpretation above.
         
     NOTE:
     ----
