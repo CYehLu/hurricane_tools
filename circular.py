@@ -215,7 +215,7 @@ def circular_avg_closure(lon, lat, clon, clat, radius, dxdy=None, **kwargs):
     return inner
 
 
-def rmw(lon, lat, ws, clon, clat, maxdist=550, box=True, **kwargs):
+def rmw(lon, lat, ws, clon, clat, maxdist=550, dr=1, box=True, **kwargs):
     """
     Find TC RMW
     
@@ -228,7 +228,9 @@ def rmw(lon, lat, ws, clon, clat, maxdist=550, box=True, **kwargs):
     clon, clat : scalar
         TC center longtitude / latitude
     maxdist : scalar
-        The maximum search distance (km). default is 550
+        The maximum search distance (km). Default is 550
+    dr : scalar
+        The radius (km) interval. Default is 1
     box : bool
         Create a box area that only calculate interpolation in this
         box. Default is True.
@@ -237,10 +239,10 @@ def rmw(lon, lat, ws, clon, clat, maxdist=550, box=True, **kwargs):
         
     Return
     ------
-    dist_coord : 1d array, shape = (n,)
-        The coordinate of `axissym_ws`.
+    radius : 1d array, shape = (n,)
+        Radius, the coordinate of `axissym_ws`.
         The distance between i'th `axissym_ws` profile location
-        and TC center is dist_coord[i].
+        and TC center is radius[i].
     axissym_ws : 1d array, shape = (n,)
         Axis-symmetric wind speed profile
     rmw : scalar
@@ -270,24 +272,9 @@ def rmw(lon, lat, ws, clon, clat, maxdist=550, box=True, **kwargs):
         lon_box = lon
         lat_box = lat
         ws_box = ws
-        
-    # 2020/07/01: update this part because of the update of `circular_avg`
-    """
-    # prepare to circular average
-    maxlat = maxdist / 110.567   # 1 lat degree = 110.567 km
-    lonlat = np.hstack([lon_box.reshape(-1, 1), lat_box.reshape(-1, 1)])
-    ws_1d = ws_box.ravel()
-    r = np.linspace(0, maxlat, maxdist) 
-    
-    # find the axissymmetric wind profile and RMW
-    axissym_ws = circular_avg(lonlat, ws_1d, clon, clat, r, **kwargs)
-    rmw = r[np.nanargmax(axissym_ws)] * 110.567
-    dist_coord = r * 110.567
-    
-    return dist_coord, axissym_ws, rmw
-    """
-    
-    radius = np.linspace(0, maxdist, maxdist)
+
+    #radius = np.linspace(0, maxdist, maxdist)
+    radius = np.arange(0, maxdist+dr, dr)
     axissym_ws = circular_avg(lon_box, lat_box, ws_box, clon, clat, radius)
     rmw = radius[np.nanargmax(axissym_ws)]
     return radius, axissym_ws, rmw

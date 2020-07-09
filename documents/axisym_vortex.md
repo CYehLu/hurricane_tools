@@ -12,7 +12,7 @@
     r : scalar, 1-d array-like or 2-d array-like
         Radius
     vmax : scalar
-        The maximum tangent wind speed.
+        The maximum tangential wind speed.
     rmax : scalar
         The radius of maximum wind speed.
     alpha : scalar, optional
@@ -21,6 +21,7 @@
     Return:
     ------
     V : scalar, 1-d array-like or 2-d array-like
+        Tangential wind speed.
 
 
 
@@ -51,7 +52,8 @@
     Return:
     ------
     V : scalar, 1-d array-like or 2-d array-like
-    
+        Tangential wind speed.
+        
     Reference:
     ---------
     [1] G. J. Holland, "An Analytic Model of the Wind and Pressure Profiles in Hurricanes"

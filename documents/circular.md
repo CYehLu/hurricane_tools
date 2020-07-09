@@ -38,7 +38,10 @@
             
     Returns:
     -------
-    circular average result, 1-d array with size=len(radius).
+    If `return_interp` is False (default option):
+        Circular average result, 1-d array with size=len(radius).
+    If `return_interp` is True:
+        See `return_interp` argument interpretation above.
         
     NOTE:
     ----
@@ -69,7 +72,7 @@
 
 
 ******
-<span style="color:#a77864">**rmw**</span>**(lon, lat, ws, clon, clat, maxdist=550, box=True, **kwargs)**
+<span style="color:#a77864">**rmw**</span>**(lon, lat, ws, clon, clat, maxdist=550, dr=1, box=True, **kwargs)**
 
     Find TC RMW
     
@@ -82,7 +85,9 @@
     clon, clat : scalar
         TC center longtitude / latitude
     maxdist : scalar
-        The maximum search distance (km). default is 550
+        The maximum search distance (km). Default is 550
+    dr : scalar
+        The radius (km) interval. Default is 1
     box : bool
         Create a box area that only calculate interpolation in this
         box. Default is True.
@@ -91,10 +96,10 @@
         
     Return
     ------
-    dist_coord : 1d array, shape = (n,)
-        The coordinate of `axissym_ws`.
+    radius : 1d array, shape = (n,)
+        Radius, the coordinate of `axissym_ws`.
         The distance between i'th `axissym_ws` profile location
-        and TC center is dist_coord[i].
+        and TC center is radius[i].
     axissym_ws : 1d array, shape = (n,)
         Axis-symmetric wind speed profile
     rmw : scalar
