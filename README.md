@@ -51,7 +51,7 @@ distance.py
 ******
 parse_wrf_center_mesg.py
 ------
-[document](./documents/arse_wrf_center_mesg.md) 
+[document](./documents/parse_wrf_center_mesg.md) 
 
 | Function | Description |
 | :------- | :---------- |

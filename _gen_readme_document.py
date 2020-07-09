@@ -162,7 +162,7 @@ with open('README.md', 'w') as mdfile:
     for module_name, sub_dict in module_dict['description'].items():
         write_content.append(module_name)
         write_content.append('------')
-        write_content.append(f'[document](./documents/{module_name.strip(".py")}.md) \n')
+        write_content.append(f'[document](./documents/{module_name.rstrip(".py")}.md) \n')
         write_content.append('| Function | Description |')
         write_content.append('| :------- | :---------- |')
         
