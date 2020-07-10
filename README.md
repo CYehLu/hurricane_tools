@@ -20,8 +20,8 @@ center.py
 
 | Function | Description |
 | :------- | :---------- |
-| <font color="#a77864"> **ty_center_mslp** </font> | Find typhoon center by minimum sea level pressure grid (no weighted). |
-| <font color="#a77864"> **weighted_ty_center** </font> | Giving first guess typhoon center longtitude and latitude, calculate the new center by weighted mothod. |
+| <font color="#a77864"> **tc_center_mslp** </font> | Find TC center by minimum sea level pressure grid (no weighted). |
+| <font color="#a77864"> **weighted_tc_center** </font> | Calculate TC center by weighted method. |
 
 
 ******

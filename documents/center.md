@@ -1,7 +1,7 @@
 # center.py
-<span style="color:#a77864">**ty_center_mslp**</span>**(lon, lat, slp)**
+<span style="color:#a77864">**tc_center_mslp**</span>**(lon, lat, slp)**
 
-    Find typhoon center by minimum sea level pressure grid (no weighted).
+    Find TC center by minimum sea level pressure grid (no weighted).
     
     Parameter
     ---------
@@ -17,28 +17,27 @@
 
 
 ******
-<span style="color:#a77864">**weighted_ty_center**</span>**(lon, lat, center_lon, center_lat, var, latlon_range=1)**
+<span style="color:#a77864">**weighted_tc_center**</span>**(lon, lat, var, clon=None, clat=None, L=12)**
 
-    Giving first guess typhoon center longtitude and latitude, calculate the 
-    new center by weighted mothod.
+    Calculate TC center by weighted method.
     
     Parameter:
     ---------
     lon, lat: 
         2-d numpy ndarray. Their shape should be equal.
-    center_lon, center_lat: 
-        float, the first guess typhoon center coordinate.
     var:
-        2-d numpy ndarray. Used for determination the center of typhoon, usually
-        is pressure.
+        2-d numpy ndarray. Used for determination the center of TC, usually
+        is sea level pressure.
         Its shape should equal to lon and lat.
-    latlon_range: 
-        scaler, the degree of lat/lon which will generate a box to calculate the
-        weights.
+    clon, clat:
+        scalar. The first gauess of TC center.
+        If None (default), it would use the result of `tc_center_mslp`.
+    L:
+        int. The half length of weighted box edge length. Default is 12.
         
     Return:
     ------
-    tuple, (new_lon, new_lat). 
+    tuple, (weighted_center_lon, weighted_center_lat). 
 
 
 

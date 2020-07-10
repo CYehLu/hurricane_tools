@@ -1,9 +1,9 @@
 import numpy as np
 
 
-def ty_center_mslp(lon, lat, slp):
+def tc_center_mslp(lon, lat, slp):
     """
-    Find typhoon center by minimum sea level pressure grid (no weighted).
+    Find TC center by minimum sea level pressure grid (no weighted).
     
     Parameter
     ---------
@@ -20,50 +20,48 @@ def ty_center_mslp(lon, lat, slp):
     clon, clat = lon[i,j], lat[i,j]
     return clon, clat
     
-    
-def weighted_ty_center(lon, lat, center_lon, center_lat, var, latlon_range=1):
+
+def weighted_tc_center(lon, lat, var, clon=None, clat=None, L=12):
     """
-    Giving first guess typhoon center longtitude and latitude, calculate the 
-    new center by weighted mothod.
+    Calculate TC center by weighted method.
     
     Parameter:
     ---------
     lon, lat: 
         2-d numpy ndarray. Their shape should be equal.
-    center_lon, center_lat: 
-        float, the first guess typhoon center coordinate.
     var:
-        2-d numpy ndarray. Used for determination the center of typhoon, usually
-        is pressure.
+        2-d numpy ndarray. Used for determination the center of TC, usually
+        is sea level pressure.
         Its shape should equal to lon and lat.
-    latlon_range: 
-        scaler, the degree of lat/lon which will generate a box to calculate the
-        weights.
+    clon, clat:
+        scalar. The first gauess of TC center.
+        If None (default), it would use the result of `tc_center_mslp`.
+    L:
+        int. The half length of weighted box edge length. Default is 12.
         
     Return:
     ------
-    tuple, (new_lon, new_lat). 
+    tuple, (weighted_center_lon, weighted_center_lat). 
     """
-    # find the box
-    bool_lat = (lat >= center_lat - latlon_range) & (lat <= center_lat + latlon_range)
-    bool_lon = (lon >= center_lon - latlon_range) & (lon <= center_lon + latlon_range)
-    bool_lonlat = bool_lat & bool_lon
-    where = np.where(bool_lonlat)
-    left_grid = np.min(where[0])
-    right_grid = np.max(where[0])
-    bottom_grid = np.min(where[1])
-    top_grid = np.max(where[1])
+    if clon is None and clat is None:
+        clon, clat = tc_center_mslp(lon, lat, slp)
     
-    # restrict the lat, lon and var in the box range
-    box_lat = lat[left_grid:right_grid,bottom_grid:top_grid]
-    box_lon = lon[left_grid:right_grid,bottom_grid:top_grid]
-    box_var = var[left_grid:right_grid,bottom_grid:top_grid]
+    # find the nearest grid point to clon and clat
+    diff_lon = np.abs(lon - clon)
+    diff_lat = np.abs(lat - clat)
+    idx = np.unravel_index(np.argmin(diff_lon + diff_lat), lon.shape)
     
-    mean_box_var = np.mean(box_var)
+    # box area
+    lon_b = lon[idx[0]-L:idx[0]+L, idx[1]-L:idx[1]+L]
+    lat_b = lat[idx[0]-L:idx[0]+L, idx[1]-L:idx[1]+L]
+    var_b = var[idx[0]-L:idx[0]+L, idx[1]-L:idx[1]+L]
     
-    # only the positive deviation values can be kept
-    weights = np.abs(mean_box_var - box_var) * np.heaviside(mean_box_var - box_var, 0)
-    new_center_lon = np.sum(weights * box_lon) / np.sum(weights)
-    new_center_lat = np.sum(weights * box_lat) / np.sum(weights)
-    
-    return (new_center_lon, new_center_lat)
+    # find weighted center
+    weight = np.zeros_like(var_b)
+    mean_var_b = np.mean(var_b)
+    wloc = var_b < mean_var_b
+    weight[wloc] = (mean_var_b - var_b)[wloc]
+    sumw = np.sum(weight)
+    new_clon = np.sum(weight * lon_b) / sumw
+    new_clat = np.sum(weight * lat_b) / sumw
+    return new_clon, new_clat
