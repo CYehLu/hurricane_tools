@@ -44,7 +44,7 @@ def weighted_tc_center(lon, lat, var, clon=None, clat=None, L=12):
     tuple, (weighted_center_lon, weighted_center_lat). 
     """
     if clon is None and clat is None:
-        clon, clat = tc_center_mslp(lon, lat, slp)
+        clon, clat = tc_center_mslp(lon, lat, var)
     
     # find the nearest grid point to clon and clat
     diff_lon = np.abs(lon - clon)
