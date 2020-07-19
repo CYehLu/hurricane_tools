@@ -1,4 +1,45 @@
 # circular.py
+<span style="color:#a77864">**interp_circle**</span>**(X, Y, values, cx, cy, radius, theta=None, dxdy=None, coord='lonlat', **kwargs)**
+
+    Interpolating data on the circles.
+    
+    Parameters:
+    ----------
+    X, Y: 2-d array, shape = (ny, nx)
+        The coordinates of the `values`.
+    values: 2-d array, shape = (ny, nx)
+        Values on `X` and `Y` coordinate.
+    cx, cy: scalar
+        Center coordinate of the circle.
+    radius: scalar or 1-d array-like, shape = (nradius,)
+        The radius of circles.
+    theta: 1-d array, shape = (ntheta,). Optional
+        The angles (radians) of each sampled points on the circle.
+        Default is np.arange(*np.deg2rad([0, 360, 1])), the whole circle.
+        Examples:
+        >>> theta = np.arange(*np.deg2rad([0, 360, 1]))   # whole circle
+        >>> theta = np.arange(*np.deg2rad([0, 180, 1]))   # upper half circle
+        >>> theta = np.arange(*np.deg2rad([90, 270, 10]))   # left half circle, coarser samples
+    dxdy: 2-elements tuple, (dx, dy). Optional
+        Spatial resolution. 
+        Default is None, and it would automatically derived based on `X` and `Y`.
+    coord: str, 'lonlat' or 'xy'. Optional
+        The coordinate system of `X` and `Y`.
+        If coord = `xy`, then `X` and `Y` are cartesain coordinate.
+        If coord = 'lonlat', then `X` and `Y` are longtitude and latitude.
+        Default is `lonlat`.
+    **kwargs: {method, fill_value, rescale}
+        The parameters used in scipy.interpolate.griddata.
+        Check document for griddata:
+        https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html
+        
+    Return:
+    ------
+    Interpolating result, shape = (nradius, ntheta)
+
+
+
+******
 <span style="color:#a77864">**circular_avg**</span>**(lon, lat, values, clon, clat, radius, dxdy=None, **kwargs)**
 
     Calculate circular mean.
@@ -18,19 +59,11 @@
         Default is None, and it would automatically derive dx and dy besed on `lon`
         and `lat`.
         
-    **kwargs: {theta, return_interp, method, fill_value, rescale}
-        theta: 3-elements tuple. (theta_start, theta_end, dtheta)
-            The start angle on the circle (theta_start), the ending angle on the
-            circle (theta_end), and the angle interval of the circle samples (dtheta).
-            Default is (0, 2*pi, 2*pi/360), the whole circle.
-        return_interp: bool. Optional
-            If `return_interp` = True, it would return the whole interpolating result
-            with shape = (n_radius, n_theta), where `n_radius` is the number of radius
-            samples and `n_theta` is the number of theta samples.
-            And the circular mean is just the theta average of return result.
-            e.g >>> interp = circular_avg(..., return_interp=True)   # shape=(n_radius, n_theta)
-                >>> cir_avg = interp.mean(axis=1)   # shape=(n_radius,)
-            Default is False.
+    **kwargs: {theta, method, fill_value, rescale}
+        theta: 1-d array
+            The angles (radians) of each sampled points on the circle.
+            See `interp_circle`.
+            Default is np.arange(*np.deg2rad([0, 360, 1])), the whole circle.
         method, fill_value, rescale:
             The parameters used in scipy.interpolate.griddata.
             Check document for griddata:
@@ -38,10 +71,7 @@
             
     Returns:
     -------
-    If `return_interp` is False (default option):
-        Circular average result, 1-d array with size=len(radius).
-    If `return_interp` is True:
-        See `return_interp` argument interpretation above.
+    The circular average result on each radius, shape = (len(radius),)
         
     NOTE:
     ----
@@ -67,7 +97,7 @@
     
     Returs:
     ------
-    closure function
+    a closure function
 
 
 

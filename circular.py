@@ -3,6 +3,114 @@ from scipy.interpolate import griddata
 from scipy.integrate import trapz, simps
 
 from .distance import latlon2distance
+from .interpolate import FastGriddata
+
+
+def _interp_circle_xy(X, Y, values, cx, cy, radius, theta, dxdy):
+    """interpolating data on the circle for cartesain coordinate"""
+    pass
+
+
+def _interp_circle_lonlat(lon, lat, values, clon, clat, radius, theta, dxdy, **kwargs):
+    """interpolating data on the circle for lon/lat coordinate"""
+    dx, dy = dxdy
+    nums_r = radius.size
+    nums_t = theta.size
+    
+    # the meridional/zonal distance between center and every grid points
+    dist_lon = latlon2distance(clon, lat, lon, lat)    # (ny, nx)
+    dist_lat = latlon2distance(lon, clat, lon, lat)
+    dist_full = np.sqrt(dist_lon**2 + dist_lat**2)
+    
+    # give signs to dist_lon/lat (west of `clon` or south of `clat` would be negative)
+    dist_lon[lon < clon] *= -1
+    dist_lat[lat < clat] *= -1
+    
+    # set a box area to reduce the amount of computation
+    max_r = radius.max()
+    L_lon = int(max_r // dx) + 6
+    L_lat = int(max_r // dy) + 6
+    cix = np.unravel_index(dist_full.argmin(), dist_full.shape)  # (nearly) center index
+    dist_lon_b = dist_lon[cix[0]-L_lat:cix[0]+L_lat, cix[1]-L_lon:cix[1]+L_lon]
+    dist_lat_b = dist_lat[cix[0]-L_lat:cix[0]+L_lat, cix[1]-L_lon:cix[1]+L_lon]
+    values_b = values[cix[0]-L_lat:cix[0]+L_lat, cix[1]-L_lon:cix[1]+L_lon]
+    
+    # reshape into interpolation form
+    dist_lonlat_b = np.vstack((dist_lon_b.ravel(), dist_lat_b.ravel())).T
+    val_b = values_b.ravel()
+    
+    # construct circular samples points and interpolate
+    circle_pts = np.zeros((nums_t*nums_r, 2))
+    circle_pts[:,0] = radius.repeat(nums_t) * np.cos(np.tile(theta, nums_r))
+    circle_pts[:,1] = radius.repeat(nums_t) * np.sin(np.tile(theta, nums_r))
+    interp = griddata(dist_lonlat_b, val_b, circle_pts, **kwargs)
+    
+    return interp.reshape(nums_r, nums_t)
+    
+
+def interp_circle(X, Y, values, cx, cy, radius, theta=None, dxdy=None, coord='lonlat', **kwargs):
+    """
+    Interpolating data on the circles.
+    
+    Parameters:
+    ----------
+    X, Y: 2-d array, shape = (ny, nx)
+        The coordinates of the `values`.
+    values: 2-d array, shape = (ny, nx)
+        Values on `X` and `Y` coordinate.
+    cx, cy: scalar
+        Center coordinate of the circle.
+    radius: scalar or 1-d array-like, shape = (nradius,)
+        The radius of circles.
+    theta: 1-d array, shape = (ntheta,). Optional
+        The angles (radians) of each sampled points on the circle.
+        Default is np.arange(*np.deg2rad([0, 360, 1])), the whole circle.
+        Examples:
+        >>> theta = np.arange(*np.deg2rad([0, 360, 1]))   # whole circle
+        >>> theta = np.arange(*np.deg2rad([0, 180, 1]))   # upper half circle
+        >>> theta = np.arange(*np.deg2rad([90, 270, 10]))   # left half circle, coarser samples
+    dxdy: 2-elements tuple, (dx, dy). Optional
+        Spatial resolution. 
+        Default is None, and it would automatically derived based on `X` and `Y`.
+    coord: str, 'lonlat' or 'xy'. Optional
+        The coordinate system of `X` and `Y`.
+        If coord = `xy`, then `X` and `Y` are cartesain coordinate.
+        If coord = 'lonlat', then `X` and `Y` are longtitude and latitude.
+        Default is `lonlat`.
+    **kwargs: {method, fill_value, rescale}
+        The parameters used in scipy.interpolate.griddata.
+        Check document for griddata:
+        https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html
+        
+    Return:
+    ------
+    Interpolating result, shape = (nradius, ntheta)
+    """
+    # convert `radius` to iterable
+    if isinstance(radius, (int, float)):
+        radius = np.array([radius])
+    elif isinstance(radius, list):
+        radius = np.array(radius)
+    
+    if theta is None:
+        theta = np.arange(*np.deg2rad([0, 360, 1]))
+    
+    if coord == 'xy':
+        if dxdy is None:
+            dx = X[0,1] - X[0,0]
+            dy = Y[1,0] - Y[0,0]
+            dxdy = (dx, dy)
+        return _interp_circle_xy(X, Y, values, cx, cy, radius, theta, dxdy, **kwargs)
+    
+    elif coord == 'lonlat':
+        if dxdy is None:
+            dx = latlon2distance(X[0,0], Y[0,0], X[0,1], Y[0,0])
+            dy = latlon2distance(X[0,0], Y[0,0], X[0,0], Y[1,0])
+            dxdy = (dx, dy)
+        return _interp_circle_lonlat(X, Y, values, cx, cy, radius, theta, dxdy, **kwargs)
+    
+    else:
+        raise ValueError(f"Unavailable coord: {coord}. It shold be 'lonlat' or 'xy'.")
 
 
 def circular_avg(lon, lat, values, clon, clat, radius, dxdy=None, **kwargs):
@@ -24,19 +132,11 @@ def circular_avg(lon, lat, values, clon, clat, radius, dxdy=None, **kwargs):
         Default is None, and it would automatically derive dx and dy besed on `lon`
         and `lat`.
         
-    **kwargs: {theta, return_interp, method, fill_value, rescale}
-        theta: 3-elements tuple. (theta_start, theta_end, dtheta)
-            The start angle on the circle (theta_start), the ending angle on the
-            circle (theta_end), and the angle interval of the circle samples (dtheta).
-            Default is (0, 2*pi, 2*pi/360), the whole circle.
-        return_interp: bool. Optional
-            If `return_interp` = True, it would return the whole interpolating result
-            with shape = (n_radius, n_theta), where `n_radius` is the number of radius
-            samples and `n_theta` is the number of theta samples.
-            And the circular mean is just the theta average of return result.
-            e.g >>> interp = circular_avg(..., return_interp=True)   # shape=(n_radius, n_theta)
-                >>> cir_avg = interp.mean(axis=1)   # shape=(n_radius,)
-            Default is False.
+    **kwargs: {theta, method, fill_value, rescale}
+        theta: 1-d array
+            The angles (radians) of each sampled points on the circle.
+            See `interp_circle`.
+            Default is np.arange(*np.deg2rad([0, 360, 1])), the whole circle.
         method, fill_value, rescale:
             The parameters used in scipy.interpolate.griddata.
             Check document for griddata:
@@ -44,10 +144,7 @@ def circular_avg(lon, lat, values, clon, clat, radius, dxdy=None, **kwargs):
             
     Returns:
     -------
-    If `return_interp` is False (default option):
-        Circular average result, 1-d array with size=len(radius).
-    If `return_interp` is True:
-        See `return_interp` argument interpretation above.
+    The circular average result on each radius, shape = (len(radius),)
         
     NOTE:
     ----
@@ -55,69 +152,9 @@ def circular_avg(lon, lat, values, clon, clat, radius, dxdy=None, **kwargs):
     worth to use `circular_avg_closure` instead. `circular_avg_closure` returns a closure function
     which only use `values` as its parameter.
     """
-    # check kwargs, the remainning part of kwargs would only contain the arguments of `griddata`
-    if kwargs.get('theta'):
-        theta_start, theta_end, dtheta = kwargs.get('theta')
-        thetas = np.arange(theta_start, theta_end, dtheta)
-        kwargs.pop('theta', None)
-    else:
-        theta_start, theta_end, dtheta = np.deg2rad([0, 360, 1])
-        thetas = np.arange(theta_start, theta_end, dtheta)
-    nums_t = thetas.size
-    
-    if kwargs.get('return_interp'):
-        return_flag = True
-    else:
-        return_flag = False
-    kwargs.pop('return_interp', None)
-        
-    # check `dxdy`, if None then determine `dx` and `dy` based on `lon` and `lat`
-    if dxdy is None:
-        dx = latlon2distance(lon[0,0], lat[0,0], lon[0,1], lat[0,0])
-        dy = latlon2distance(lon[0,0], lat[0,0], lon[0,0], lat[1,0])
-    else:
-        dx, dy = dxdy
-    
-    # convert `radius` to iterable
-    if isinstance(radius, (int, float)):
-        radius = np.array([radius])
-    elif isinstance(radius, list):
-        radius = np.array(radius)
-    nums_r = radius.size
-    
-    # the meridional/zonal distance between center and every grid points
-    dist_lon = latlon2distance(clon, lat, lon, lat)    # (ny, nx)
-    dist_lat = latlon2distance(lon, clat, lon, lat)    # (ny, nx)
-    dist_full = np.sqrt(dist_lon**2 + dist_lat**2)    # (ny, nx)
-    
-    # give signs to dist_lon/lat (west of `clon` or south of `clat` would be negative)
-    dist_lon[lon < clon] *= -1
-    dist_lat[lat < clat] *= -1
-    
-    # set a box area to reduce the amount of computation
-    max_r = radius.max()
-    L_lon = int(max_r // dx) + 6
-    L_lat = int(max_r // dy) + 6
-    cix = np.unravel_index(dist_full.argmin(), dist_full.shape)  # (nearly) center index
-    dist_lon_b = dist_lon[cix[0]-L_lat:cix[0]+L_lat, cix[1]-L_lon:cix[1]+L_lon]
-    dist_lat_b = dist_lat[cix[0]-L_lat:cix[0]+L_lat, cix[1]-L_lon:cix[1]+L_lon]
-    values_b = values[cix[0]-L_lat:cix[0]+L_lat, cix[1]-L_lon:cix[1]+L_lon]
-    
-    # reshape into interpolation form
-    dist_lonlat_b = np.vstack((dist_lon_b.ravel(), dist_lat_b.ravel())).T
-    val_b = values_b.ravel()
-    
-    # construct circular samples points and interpolate
-    circle_pts = np.zeros((nums_t*nums_r, 2))
-    circle_pts[:,0] = radius.repeat(nums_t) * np.cos(np.tile(thetas, nums_r))
-    circle_pts[:,1] = radius.repeat(nums_t) * np.sin(np.tile(thetas, nums_r))
-    interp = griddata(dist_lonlat_b, val_b, circle_pts, **kwargs)
-    
-    if return_flag:
-        return interp.reshape(nums_r, nums_t)
-    else:
-        res = interp.reshape(nums_r, nums_t).mean(axis=1)
-        return res
+    theta = kwargs.pop('theta', None)
+    res = interp_circle(lon, lat, values, clon, clat, radius, theta, dxdy, 'lonlat', **kwargs)
+    return res.mean(axis=1)
 
 
 def circular_avg_closure(lon, lat, clon, clat, radius, dxdy=None, **kwargs):
@@ -135,42 +172,32 @@ def circular_avg_closure(lon, lat, clon, clat, radius, dxdy=None, **kwargs):
     
     Returs:
     ------
-    closure function
+    a closure function
     """
-    # check kwargs, the remainning part of kwargs would only contain the arguments of `griddata`
-    if kwargs.get('theta'):
-        theta_start, theta_end, dtheta = kwargs.get('theta')
-        thetas = np.arange(theta_start, theta_end, dtheta)
-        kwargs.pop('theta', None)
-    else:
-        theta_start, theta_end, dtheta = np.deg2rad([0, 360, 1])
-        thetas = np.arange(theta_start, theta_end, dtheta)
-    nums_t = thetas.size
-    
-    if kwargs.get('return_interp'):
-        return_flag = True
-    else:
-        return_flag = False
-    kwargs.pop('return_interp', None)
-        
-    # check `dxdy`, if None then determine `dx` and `dy` based on `lon` and `lat`
-    if dxdy is None:
-        dx = latlon2distance(lon[0,0], lat[0,0], lon[0,1], lat[0,0])
-        dy = latlon2distance(lon[0,0], lat[0,0], lon[0,0], lat[1,0])
-    else:
-        dx, dy = dxdy
+    # get `theta`
+    theta = kwargs.pop('theta', None)
+    if theta is None:
+        theta = np.arange(*np.deg2rad([0, 360, 1]))
     
     # convert `radius` to iterable
     if isinstance(radius, (int, float)):
         radius = np.array([radius])
     elif isinstance(radius, list):
         radius = np.array(radius)
+    
+    if dxdy is None:
+        dx = latlon2distance(lon[0,0], lat[0,0], lon[0,1], lat[0,0])
+        dy = latlon2distance(lon[0,0], lat[0,0], lon[0,0], lat[1,0])
+    else:
+        dx, dy = dxdy
+        
+    nums_t = theta.size
     nums_r = radius.size
     
     # the meridional/zonal distance between center and every grid points
     dist_lon = latlon2distance(clon, lat, lon, lat)    # (ny, nx)
-    dist_lat = latlon2distance(lon, clat, lon, lat)    # (ny, nx)
-    dist_full = np.sqrt(dist_lon**2 + dist_lat**2)    # (ny, nx)
+    dist_lat = latlon2distance(lon, clat, lon, lat)
+    dist_full = np.sqrt(dist_lon**2 + dist_lat**2)
     
     # give signs to dist_lon/lat (west of `clon` or south of `clat` would be negative)
     dist_lon[lon < clon] *= -1
@@ -187,10 +214,11 @@ def circular_avg_closure(lon, lat, clon, clat, radius, dxdy=None, **kwargs):
     # reshape into interpolation form
     dist_lonlat_b = np.vstack((dist_lon_b.ravel(), dist_lat_b.ravel())).T
     
-    # construct circular sample points
+    # construct circular samples points and interpolate
     circle_pts = np.zeros((nums_t*nums_r, 2))
-    circle_pts[:,0] = radius.repeat(nums_t) * np.cos(np.tile(thetas, nums_r))
-    circle_pts[:,1] = radius.repeat(nums_t) * np.sin(np.tile(thetas, nums_r))
+    circle_pts[:,0] = radius.repeat(nums_t) * np.cos(np.tile(theta, nums_r))
+    circle_pts[:,1] = radius.repeat(nums_t) * np.sin(np.tile(theta, nums_r))
+    interp_obj = FastGriddata(dist_lonlat_b, circle_pts)
     
     def inner(values):
         """
@@ -204,13 +232,8 @@ def circular_avg_closure(lon, lat, clon, clat, radius, dxdy=None, **kwargs):
         """
         values_b = values[cix[0]-L_lat:cix[0]+L_lat, cix[1]-L_lon:cix[1]+L_lon]
         val_b = values_b.ravel()
-        interp = griddata(dist_lonlat_b, val_b, circle_pts, **kwargs)
-        
-        if return_flag:
-            return interp.reshape(nums_r, nums_t)
-        else:
-            res = interp.reshape(nums_r, nums_t).mean(axis=1)
-            return res
+        interp = interp_obj.interpolate(val_b)
+        return interp.reshape(nums_r, nums_t).mean(axis=1)
     
     return inner
 

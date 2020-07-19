@@ -54,7 +54,8 @@ def parse_pyfile(content):
     while i < len(content):
         line = content[i]
 
-        if line.startswith('def'):
+        # exclude private function, e.g: "def _private_func()"
+        if line.startswith('def') and not line.split()[1].startswith('_'):
             func_name = line.split()[1].split('(')[0]    # only function name
             func_name_args = line.strip('def').strip().strip(':')    # with args
 
