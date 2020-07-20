@@ -10,7 +10,7 @@ class DownloadWarning(Warning):
         return 'Download new best track data'
 
 
-class JMAbst_parser:   
+class JMAbstParser:   
     def __init__(self, mode='lite'):       
         if mode not in ['lite', 'full', 'txt']:
             raise ValueError(f'Unavailable mode: {mode}')

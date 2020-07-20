@@ -1,4 +1,4 @@
-# parse_wrf_center_mesg.py
+# parse_wrf_center_mesg
 <span style="color:#a77864">**parse_wrf_rsl_error**</span>**(wrfrun_path)**
 
     Parse `rsl.error.0000` outputed from WRF to get the center information.

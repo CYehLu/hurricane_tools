@@ -1,4 +1,4 @@
-# circular.py
+# circular
 <span style="color:#a77864">**interp_circle**</span>**(X, Y, values, cx, cy, radius, theta=None, dxdy=None, coord='lonlat', **kwargs)**
 
     Interpolating data on the circles.
@@ -159,10 +159,8 @@
         Numerical integration method. 'trapz' is trapezoidal method, and `simps` is Simpson’s
         method. 
         See scipy document: https://reurl.cc/X6KpYD
-    **kwargs : method, fill_value, rescale
-        The parameters used in scipy.interpolate.griddata.
-        Check document for griddata:
-        https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html
+    **kwargs : 
+        Keyword arguments for `circular_avg`
         
     Return:
     ------

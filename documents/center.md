@@ -1,4 +1,4 @@
-# center.py
+# center
 <span style="color:#a77864">**tc_center_mslp**</span>**(lon, lat, slp)**
 
     Find TC center by minimum sea level pressure grid (no weighted).

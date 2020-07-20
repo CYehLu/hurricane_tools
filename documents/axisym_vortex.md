@@ -1,4 +1,4 @@
-# axisym_vortex.py
+# axisym_vortex
 <span style="color:#a77864">**rankine_vortex**</span>**(r, vmax, rmax, alpha=1)**
 
     Classic rankine vortex.
