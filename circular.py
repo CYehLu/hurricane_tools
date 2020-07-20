@@ -324,10 +324,8 @@ def axisymmetricity(lon, lat, var, radius, clon, clat, dxdy=None, integ='trapz',
         Numerical integration method. 'trapz' is trapezoidal method, and `simps` is Simpson’s
         method. 
         See scipy document: https://reurl.cc/X6KpYD
-    **kwargs : method, fill_value, rescale
-        The parameters used in scipy.interpolate.griddata.
-        Check document for griddata:
-        https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html
+    **kwargs : 
+        Keyword arguments for `circular_avg`
         
     Return:
     ------
@@ -345,10 +343,12 @@ def axisymmetricity(lon, lat, var, radius, clon, clat, dxdy=None, integ='trapz',
         dy = latlon2distance(lon[0,0], lat[0,0], lon[0,0], lat[1,0])
         dxdy = (dx, dy)
         
-    if kwargs.get('theta'):
-        _, _, dtheta = kwargs.get('theta')
-    else:
-        dtheta = 2 * np.pi / 360   # the default `dtheta` in `circular_avg`
+    #if kwargs.get('theta'):
+    #    _, _, dtheta = kwargs.get('theta')
+    #else:
+    #    dtheta = 2 * np.pi / 360   # the default `dtheta` in `circular_avg`
+    theta = kwargs.pop('theta', np.arange(*np.deg2rad([0, 360, 1])))
+    dtheta = theta[1] - theta[0]
         
     if integ == 'trapz':
         int_func = trapz
@@ -358,7 +358,8 @@ def axisymmetricity(lon, lat, var, radius, clon, clat, dxdy=None, integ='trapz',
         raise ValueError(f'Unavailable `integ`: {integ}. It should be "trapz" or "simps".')
         
     kwargs.pop('return_interp', None)
-    interp = circular_avg(lon, lat, var, clon, clat, radius, dxdy, return_interp=True, **kwargs)
+    #interp = circular_avg(lon, lat, var, clon, clat, radius, dxdy, return_interp=True, **kwargs)
+    interp = interp_circle(lon, lat, var, clon, clat, radius, theta, dxdy, coord='lonlat', **kwargs)
     ciravg = interp.mean(axis=1)    # (n_radius,)
     cirdev = interp - ciravg[:,np.newaxis]    # (n_radius, n_theta)
         
