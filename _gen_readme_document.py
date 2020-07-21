@@ -402,6 +402,7 @@ def gen_readme_document(include=None, ignore=None):
     if ignore is None:
         ignore = []
         
+    # list all files and folders
     ls = os.listdir()
     
     is_folder = [True if os.path.isdir(l) else False for l in ls]
@@ -416,6 +417,7 @@ def gen_readme_document(include=None, ignore=None):
     readme = ReadmeContent()
     
     for ff in ls:
+        # ff: files and folders
         if os.path.isdir(ff):
             parse_pkgs(None)
         else:
