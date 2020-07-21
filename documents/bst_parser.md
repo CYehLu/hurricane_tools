@@ -19,7 +19,7 @@ class <span style="color:#a77864">**JMAbstParser**</span>
 
 | Methods | Description |
 | :------ | :---------- |
-| <font color="#a77864"> **__init__** </font> | Select return mode. |
+| <font color="#a77864"> **\_\_init\_\_** </font> | Select return mode. |
 | <font color="#a77864"> **parse** </font> | Parse JMA best track based on the "TC id" or "TC name + year". |
 
 

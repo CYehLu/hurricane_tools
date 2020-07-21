@@ -330,6 +330,9 @@ class DocumentContent:
         args = '(' + name_args.split('(')[1]
         full_doc = container[3]
         
+        if '**' in args:
+            args = args.replace('*', '\*')
+        
         write_content.append(f'<span style="color:#a77864">**{name}**</span>**{args}**\n')
         write_content.append(full_doc)
         write_content.append('\n')
@@ -343,13 +346,14 @@ class DocumentContent:
         write_content.append(full_doc)
         write_content.append('\n')
                 
-        # class methods list
+        # create a tabel to list all class methods and their description
         method_dict = container[3]
         
         write_content.append('| Methods | Description |')
         write_content.append('| :------ | :---------- |')
         
         for method_name, method_info in method_dict.items():
+            method_name = method_name.replace('_', '\_')
             write_content.append(f'| <font color="#a77864"> **{method_name}** </font> | {method_info[1].strip()} |')
         write_content.append('\n')
         
@@ -361,7 +365,8 @@ class DocumentContent:
             full_doc = method_info[2]
             
             # insert '\' before every underscore '_'
-            method_name = ''.join(['\{}'.format(c) if c == '_' else c for c in method_name])
+            #method_name = ''.join(['\{}'.format(c) if c == '_' else c for c in method_name])
+            method_name = method_name.replace('_', '\_')
             
             write_content.append(f'<span style="color:#cca99b">{name}</span>.<span style="color:#a77864">**{method_name}**</span>**{args}**\n')
             write_content.append(f'{full_doc}')

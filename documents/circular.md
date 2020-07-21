@@ -2,7 +2,7 @@
 
 [[source](../circular.py)]  
 
-<span style="color:#a77864">**interp_circle**</span>**(X, Y, values, cx, cy, radius, theta=None, dxdy=None, coord='lonlat', **kwargs)**
+<span style="color:#a77864">**interp_circle**</span>**(X, Y, values, cx, cy, radius, theta=None, dxdy=None, coord='lonlat', \*\*kwargs)**
 
     Interpolating data on the circles.
     
@@ -43,7 +43,7 @@
 
 
 ******
-<span style="color:#a77864">**circular_avg**</span>**(lon, lat, values, clon, clat, radius, dxdy=None, **kwargs)**
+<span style="color:#a77864">**circular_avg**</span>**(lon, lat, values, clon, clat, radius, dxdy=None, \*\*kwargs)**
 
     Calculate circular mean.
     
@@ -85,7 +85,7 @@
 
 
 ******
-<span style="color:#a77864">**circular_avg_closure**</span>**(lon, lat, clon, clat, radius, dxdy=None, **kwargs)**
+<span style="color:#a77864">**circular_avg_closure**</span>**(lon, lat, clon, clat, radius, dxdy=None, \*\*kwargs)**
 
     Calculate circular mean.
     
@@ -105,7 +105,7 @@
 
 
 ******
-<span style="color:#a77864">**rmw**</span>**(lon, lat, ws, clon, clat, maxdist=550, dr=1, box=True, **kwargs)**
+<span style="color:#a77864">**rmw**</span>**(lon, lat, ws, clon, clat, maxdist=550, dr=1, box=True, \*\*kwargs)**
 
     Find TC RMW
     
@@ -141,7 +141,7 @@
 
 
 ******
-<span style="color:#a77864">**axisymmetricity**</span>**(lon, lat, var, radius, clon, clat, dxdy=None, integ='trapz', **kwargs)**
+<span style="color:#a77864">**axisymmetricity**</span>**(lon, lat, var, radius, clon, clat, dxdy=None, integ='trapz', \*\*kwargs)**
 
     Calculate axisymmetricity based on Miyamoto and Takemi (2013).
     

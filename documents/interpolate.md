@@ -61,8 +61,8 @@ class <span style="color:#a77864">**FastGriddata**</span>
 
 | Methods | Description |
 | :------ | :---------- |
-| <font color="#a77864"> **__init__** </font> | xy: grid points, shape = (n, 2) uv: interpolated points, shape = (m, 2) |
-| <font color="#a77864"> **__call__** </font> |  |
+| <font color="#a77864"> **\_\_init\_\_** </font> | xy: grid points, shape = (n, 2) uv: interpolated points, shape = (m, 2) |
+| <font color="#a77864"> **\_\_call\_\_** </font> |  |
 | <font color="#a77864"> **interpolate** </font> | values: values on `xy` coordinates. shape = (n, 2) return interpolating result, shape = (m, 2) |
 
 
