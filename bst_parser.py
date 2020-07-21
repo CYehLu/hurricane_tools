@@ -11,7 +11,18 @@ class DownloadWarning(Warning):
 
 
 class JMAbstParser:   
+    """Parse JMA best track information."""
+    
     def __init__(self, mode='lite'):       
+        """
+        Select return mode.
+        
+        mode: str, {'lite', 'full', 'txt'}. Default is `lite`.
+            Mode `lite` would only remain `time`, `grade`, `center latitude`, `center longtitude`
+            and `minimum sea level pressure` information.
+            Mode `full` would keep all information in JMA best track document.
+            Mode `txt` would return a string.
+        """
         if mode not in ['lite', 'full', 'txt']:
             raise ValueError(f'Unavailable mode: {mode}')
         self._mode = mode
@@ -225,6 +236,18 @@ class JMAbstParser:
         return df
         
     def parse(self, id_=None, name=None, year=None):            
+        """
+        Parse JMA best track based on the "TC id" or "TC name + year".
+        
+        Parameters:
+        ----------
+        id_ : str
+            International number ID
+        name : str
+            TC name.
+        year : int
+            The year the TC occurred.
+        """
         if id_:
             allcontent, idx_line, num_line = self._search_by_id(id_)
         else:

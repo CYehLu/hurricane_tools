@@ -1,7 +1,10 @@
-# distance
+# distance  
+
+[[source](../distance.py)]  
+
 <span style="color:#a77864">**latlon2distance**</span>**(lon1, lat1, lon2, lat2)**
 
-calculate the distance (km) of two positions
+    calculate the distance (km) of two positions
 
 
 ******

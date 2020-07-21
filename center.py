@@ -1,6 +1,11 @@
 import numpy as np
 
 
+def test(a, t):
+    """test oneline docstring"""
+    pass
+
+
 def tc_center_mslp(lon, lat, slp):
     """
     Find TC center by minimum sea level pressure grid (no weighted).

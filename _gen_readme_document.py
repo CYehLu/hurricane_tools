@@ -12,8 +12,10 @@ def parse_one_line_doc(i, content):
     output: i+2 and docstring
     """
     tri_quote = '"""'
-    doc = content[i+1].strip().strip(tri_quote)
-    return i+2, doc
+    
+    # adding 4 blank in order to be consistent with multi-line situation
+    doc = '    ' + content[i+1].strip().strip(tri_quote)
+    return i+2, doc 
 
 
 def parse_multi_line_doc(i, content):
@@ -339,6 +341,7 @@ class DocumentContent:
         full_doc = container[2]
         write_content.append(f'class <span style="color:#a77864">**{name}**</span>\n')
         write_content.append(full_doc)
+        write_content.append('\n')
                 
         # class methods list
         method_dict = container[3]
@@ -368,7 +371,10 @@ class DocumentContent:
     
     @classmethod
     def write_document(cls, module_name, module_dict):
-        write_content = [f'# {module_name}']
+        write_content = [
+            f'# {module_name}  \n',
+            f'[[source](../{module_name}.py)]  \n'
+        ]
 
         for func_cls_name, container in module_dict.items():
             if container[0] == '<function>':

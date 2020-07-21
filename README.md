@@ -21,7 +21,7 @@ bst_parser
 | Function / Class | Description |
 | :--------------- | :---------- |
 | <font color="#a77864"> **DownloadWarning** </font> |  |
-| <font color="#a77864"> **JMAbstParser** </font> |  |
+| <font color="#a77864"> **JMAbstParser** </font> | Parse JMA best track information. |
 
 
 ******
@@ -31,6 +31,7 @@ center
 
 | Function / Class | Description |
 | :--------------- | :---------- |
+| <font color="#a77864"> **test** </font> | test oneline docstring |
 | <font color="#a77864"> **tc_center_mslp** </font> | Find TC center by minimum sea level pressure grid (no weighted). |
 | <font color="#a77864"> **weighted_tc_center** </font> | Calculate TC center by weighted method. |
 
@@ -67,7 +68,7 @@ interpolate
 
 | Function / Class | Description |
 | :--------------- | :---------- |
-| <font color="#a77864"> **FastGriddata** </font> | Faster version of scipy.interpolate.griddata (in repeatly interpoting case). |
+| <font color="#a77864"> **FastGriddata** </font> | Faster version of scipy.interpolate.griddata (in repeatly interpolating case). |
 
 
 ******

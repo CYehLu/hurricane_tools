@@ -1,7 +1,10 @@
-# interpolate
+# interpolate  
+
+[[source](../interpolate.py)]  
+
 class <span style="color:#a77864">**FastGriddata**</span>
 
-    Faster version of scipy.interpolate.griddata (in repeatly interpoting 
+    Faster version of scipy.interpolate.griddata (in repeatly interpolating 
     case).
     
     When performs interpolation repeatly, and parameters remain the same
@@ -53,6 +56,8 @@ class <span style="color:#a77864">**FastGriddata**</span>
     True
     >>> np.allclose(res3_g, res3_f)
     True
+
+
 
 | Methods | Description |
 | :------ | :---------- |

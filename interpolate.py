@@ -4,7 +4,7 @@ from scipy.spatial import qhull
 
 class FastGriddata:
     """
-    Faster version of scipy.interpolate.griddata (in repeatly interpoting 
+    Faster version of scipy.interpolate.griddata (in repeatly interpolating 
     case).
     
     When performs interpolation repeatly, and parameters remain the same
