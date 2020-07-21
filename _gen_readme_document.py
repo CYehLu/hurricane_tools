@@ -1,5 +1,4 @@
 import os
-from typing import List
 
 
 def parse_one_line_doc(i, content):
@@ -285,14 +284,46 @@ def parse_module(file_path):
             i += 1
             
     return module_name, module_dict
+            
 
+def find_all_files(pkg_path, result):
+    """
+    test_folder -| a.py
+                 | b.py
+                 | pkg -|c.py
+                        |d.py
+    then find_all_files('./test_folder/') would store this into `result`:
+    ['test_folder/a.py', 'test_folder/b.py', 'test_folder/pkg/c.py', 'test_folder/pkg/d.py']
+    
+    if file starts with '.' or '_', this function would ignore it and it would not be include
+    in `result`
+    """
+    if not pkg_path.endswith('/'):
+        pkg_path = pkg_path + '/'
+        
+    file_folder = os.listdir(pkg_path)
+    for ff in file_folder:
+        if not ff.startswith('.') and not ff.startswith('_'):
+            if os.path.isdir(pkg_path + ff):
+                find_all_files(pkg_path + ff, result)
+            elif os.path.isfile(pkg_path + ff):
+                result.append(pkg_path + ff)
+            
 
-def parse_pkgs(src: str, pkgs_path: List[str], result: List[str]):
-    for path in pkgs_path:
-        if os.path.isdir(path):
-            parse_pkgs(src+path+'/', os.listdir(path), result)
-        if path.endswith('.py') and not path.startswith('_'):
-            result.append(src+path)
+def parse_package(pkg_path):   
+    filepaths = []    # all file paths under `pkg_path`
+    find_all_files(pkg_path, filepaths)
+    
+    pkg_dict = {}
+    
+    for fp in filepaths:
+        if fp.endswith('.py'):
+            module_name, module_dict = parse_module(fp)
+            module_path = fp
+            
+    ## unfinished!!!!!!!!
+    return None
+    
 
 class ReadmeContent:
     def __init__(self):
@@ -415,17 +446,14 @@ def gen_readme_document(include=None, ignore=None):
     
     cond = [is_folder[i] or is_py[i] and not is_private[i] and not is_ignore[i] for i in range(len(ls))]
     ls = include + [ls[i] for i in range(len(ls)) if cond[i]]
-    # print(ls)
     ls = sorted(ls)
-    # print(ls)
     readme = ReadmeContent()
     
     for ff in ls:
         # ff: files and folders
         if os.path.isdir(ff):
-            parse_pkgs(None)
+            parse_package('./')   # Unfinished!!!!
         else:
-            print('./' + ff)
             module_name, module_dict = parse_module('./' + ff)
             readme.update_content(module_name, module_dict)
             DocumentContent.write_document(module_name, module_dict)
@@ -437,8 +465,3 @@ if __name__ == '__main__':
     include = []
     ignore = []
     gen_readme_document(include, ignore)
-    # ls = os.listdir()
-    # src = './'
-    # result = []
-    # parse_pkgs(src, ls, result)
-    # print(result)
