@@ -31,7 +31,6 @@ center
 
 | Function / Class | Description |
 | :--------------- | :---------- |
-| <font color="#a77864"> **test** </font> | test oneline docstring |
 | <font color="#a77864"> **tc_center_mslp** </font> | Find TC center by minimum sea level pressure grid (no weighted). |
 | <font color="#a77864"> **weighted_tc_center** </font> | Calculate TC center by weighted method. |
 
