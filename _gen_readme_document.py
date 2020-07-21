@@ -1,4 +1,5 @@
 import os
+from typing import List
 
 
 def parse_one_line_doc(i, content):
@@ -284,10 +285,12 @@ def parse_module(file_path):
     return module_name, module_dict
 
 
-def parse_pkgs(pkgs_path):
-    """return dict"""
-    pass
-
+def parse_pkgs(src: str, pkgs_path: List[str], result: List[str]):
+    for path in pkgs_path:
+        if os.path.isdir(path):
+            parse_pkgs(src+path+'/', os.listdir(path), result)
+        if path.endswith('.py') and not path.startswith('_'):
+            result.append(src+path)
 
 class ReadmeContent:
     def __init__(self):
@@ -400,14 +403,16 @@ def gen_readme_document(include=None, ignore=None):
     
     cond = [is_folder[i] or is_py[i] and not is_private[i] and not is_ignore[i] for i in range(len(ls))]
     ls = include + [ls[i] for i in range(len(ls)) if cond[i]]
+    # print(ls)
     ls = sorted(ls)
-    
+    # print(ls)
     readme = ReadmeContent()
     
     for ff in ls:
         if os.path.isdir(ff):
             parse_pkgs(None)
         else:
+            print('./' + ff)
             module_name, module_dict = parse_module('./' + ff)
             readme.update_content(module_name, module_dict)
             DocumentContent.write_document(module_name, module_dict)
@@ -419,3 +424,8 @@ if __name__ == '__main__':
     include = []
     ignore = []
     gen_readme_document(include, ignore)
+    # ls = os.listdir()
+    # src = './'
+    # result = []
+    # parse_pkgs(src, ls, result)
+    # print(result)
