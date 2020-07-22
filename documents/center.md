@@ -1,6 +1,6 @@
 # center  
 
-[[source](../center.py)]  
+[[source](.././hurricane_tools//center.py)]  
 
 <span style="color:#a77864">**tc_center_mslp**</span>**(lon, lat, slp)**
 

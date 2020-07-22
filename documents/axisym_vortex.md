@@ -1,6 +1,6 @@
 # axisym_vortex  
 
-[[source](../axisym_vortex.py)]  
+[[source](.././hurricane_tools//axisym_vortex.py)]  
 
 <span style="color:#a77864">**rankine_vortex**</span>**(r, vmax, rmax, alpha=1)**
 

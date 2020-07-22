@@ -1,6 +1,6 @@
 # distance  
 
-[[source](../distance.py)]  
+[[source](.././hurricane_tools//distance.py)]  
 
 <span style="color:#a77864">**latlon2distance**</span>**(lon1, lat1, lon2, lat2)**
 

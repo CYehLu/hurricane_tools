@@ -1,6 +1,6 @@
 # bst_parser  
 
-[[source](../bst_parser.py)]  
+[[source](.././hurricane_tools//bst_parser.py)]  
 
 class <span style="color:#a77864">**DownloadWarning**</span>
 

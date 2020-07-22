@@ -1,6 +1,6 @@
 # interpolate  
 
-[[source](../interpolate.py)]  
+[[source](.././hurricane_tools//interpolate.py)]  
 
 class <span style="color:#a77864">**FastGriddata**</span>
 

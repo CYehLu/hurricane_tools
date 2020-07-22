@@ -352,7 +352,7 @@ class ReadmeContent:
         self.content.append('******')
             
     def write(self):
-        with open('README.md', 'w') as file:
+        with open('./README.md', 'w') as file:
             write_content = '\n'.join(self.content)
             file.write(write_content)
 
@@ -362,10 +362,8 @@ class DocumentContent:
     def _append_function(name, container, write_content):
         name_args = container[1]
         args = '(' + name_args.split('(')[1]
+        args = args.replace('*', '\*')
         full_doc = container[3]
-        
-        if '**' in args:
-            args = args.replace('*', '\*')
         
         write_content.append(f'<span style="color:#a77864">**{name}**</span>**{args}**\n')
         write_content.append(full_doc)
@@ -398,8 +396,6 @@ class DocumentContent:
             args = '(' + name_args.split('(')[1]
             full_doc = method_info[2]
             
-            # insert '\' before every underscore '_'
-            #method_name = ''.join(['\{}'.format(c) if c == '_' else c for c in method_name])
             method_name = method_name.replace('_', '\_')
             
             write_content.append(f'<span style="color:#cca99b">{name}</span>.<span style="color:#a77864">**{method_name}**</span>**{args}**\n')
@@ -409,10 +405,10 @@ class DocumentContent:
         write_content.append('******')
     
     @classmethod
-    def write_document(cls, module_name, module_dict):
+    def write_document(cls, module_name, module_dict, path):
         write_content = [
             f'# {module_name}  \n',
-            f'[[source](../{module_name}.py)]  \n'
+            f'[[source](../{path}/{module_name}.py)]  \n'
         ]
 
         for func_cls_name, container in module_dict.items():
@@ -430,33 +426,38 @@ class DocumentContent:
             file.write(write_content)
             
 
-def gen_readme_document(include=None, ignore=None):
+def gen_readme_document(root_path, include=None, ignore=None):
     if include is None:
         include = []
     if ignore is None:
         ignore = []
         
+    if not root_path.endswith('/'):
+        root_path = root_path + '/'
+        
     # list all files and folders
-    ls = os.listdir()
+    ls = os.listdir(root_path)          # only file names
+    pls = [root_path + l for l in ls]   # path + filenames
     
-    is_folder = [True if os.path.isdir(l) else False for l in ls]
+    is_folder = [True if os.path.isdir(l) else False for l in pls]
     is_py = [True if l.endswith('.py') else False for l in ls]
     is_private = [True if l.startswith('_') else False for l in ls]
-    is_ignore = [True if l in ignore else False for l in ls]
+    is_ignore = [True if l in ignore else False for l in pls]
     
     cond = [is_folder[i] or is_py[i] and not is_private[i] and not is_ignore[i] for i in range(len(ls))]
-    ls = include + [ls[i] for i in range(len(ls)) if cond[i]]
-    ls = sorted(ls)
+    pls = include + [pls[i] for i in range(len(pls)) if cond[i]]
+    pls = sorted(pls)
+    
     readme = ReadmeContent()
     
-    for ff in ls:
+    for ff in pls:
         # ff: files and folders
         if os.path.isdir(ff):
             parse_package('./')   # Unfinished!!!!
         else:
-            module_name, module_dict = parse_module('./' + ff)
+            module_name, module_dict = parse_module(ff)
             readme.update_content(module_name, module_dict)
-            DocumentContent.write_document(module_name, module_dict)
+            DocumentContent.write_document(module_name, module_dict, root_path)
             
     readme.write()
 
@@ -464,4 +465,4 @@ def gen_readme_document(include=None, ignore=None):
 if __name__ == '__main__':
     include = []
     ignore = []
-    gen_readme_document(include, ignore)
+    gen_readme_document('./hurricane_tools/', include, ignore)
