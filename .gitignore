@@ -1,3 +1,4 @@
 .ipynb_checkpoints
 __pycache__/
 bst_all/
+hurricane_tools.egg-info
