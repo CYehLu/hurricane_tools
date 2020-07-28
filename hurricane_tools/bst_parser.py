@@ -27,8 +27,11 @@ class JMAbstParser:
             raise ValueError(f'Unavailable mode: {mode}')
         self._mode = mode
         
+        # path
+        self._path = os.path.dirname(os.path.abspath(__file__))
+        
         # check if file exists
-        if not os.path.isfile('./bst_all/bst_all.txt'):
+        if not os.path.isfile(f'{self._path}/bst_all/bst_all.txt'):
             self._download()
         
     def _download(self):
@@ -38,14 +41,14 @@ class JMAbstParser:
         url = 'https://www.jma.go.jp/jma/jma-eng/jma-center/rsmc-hp-pub-eg/Besttracks/bst_all.zip'
         resp = requests.get(url)
         
-        if not os.path.isdir('./bst_all'):
-            os.mkdir('./bst_all')
+        if not os.path.isdir(f'{self._path}/bst_all'):
+            os.mkdir(f'{self._path}/bst_all')
         
-        with open('./bst_all/bst_all.zip', 'wb') as f:
+        with open(f'{self._path}/bst_all/bst_all.zip', 'wb') as f:
             f.write(resp.content)
 
-        with zipfile.ZipFile('./bst_all/bst_all.zip', 'r') as zipf:
-            zipf.extractall('./bst_all/')
+        with zipfile.ZipFile(f'{self._path}/bst_all/bst_all.zip', 'r') as zipf:
+            zipf.extractall(f'{self._path}/bst_all/')
         
     def _check_year(self, allcontent, id_=None, year=None):
         """check the search year, and download new data if necessary"""
@@ -70,7 +73,7 @@ class JMAbstParser:
         if int(year) > int(last_year):
             # download new data
             self._download()
-            with open('./bst_all/bst_all.txt') as file:
+            with open(f'{self._path}/bst_all/bst_all.txt') as file:
                 allcontent = file.readlines()
         
         return allcontent
@@ -79,7 +82,7 @@ class JMAbstParser:
         """
         return the index of the header line, and the number of content lines
         """
-        with open('./bst_all/bst_all.txt') as file:
+        with open(f'{self._path}/bst_all/bst_all.txt') as file:
             allcontent = file.readlines()
             
         allcontent = self._check_year(allcontent, id_=id_)
@@ -97,7 +100,7 @@ class JMAbstParser:
         """
         return the index of the header line, and the number of content lines
         """
-        with open('./bst_all/bst_all.txt') as file:
+        with open(f'{self._path}/bst_all/bst_all.txt') as file:
             allcontent = file.readlines()
             
         allcontent = self._check_year(allcontent, year=year)
