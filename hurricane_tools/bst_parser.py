@@ -278,7 +278,7 @@ class JMAbstParser:
             df['time'] = pd.to_datetime(df['time'], format='%Y%m%d%H')
             
             # convert str to int and convert lat / lon
-            df = df.applymap(lambda s: int(s) if isinstance(s, str) and s.isdigit() else s)
+            df = df.applymap(lambda s: int(s) if isinstance(s, str) and s.strip().isdigit() else s)
             df['lat_center'] = df['lat_center'].astype(float) * 0.1
             df['lon_center'] = df['lon_center'].astype(float) * 0.1
 
