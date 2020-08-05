@@ -61,6 +61,16 @@ distance
 
 
 ******
+getvar
+------
+[document](./documents/getvar.md) 
+
+| Function / Class | Description |
+| :--------------- | :---------- |
+| <font color="#a77864"> **GetVar** </font> | Get variables. It is similar to `wrf.getvar` by wrf-python, but here I store every intermediate variables to speed up. |
+
+
+******
 interpolate
 ------
 [document](./documents/interpolate.md) 
