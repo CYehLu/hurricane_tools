@@ -12,11 +12,28 @@ class GetVar:
     but here I store every intermediate variables to speed up.
     """
     
-    def __init__(self, filename):
-        """Initialization. `filename` should be a str."""
+    def __init__(self, filename, timeidx=None):
+        """
+        Initialization the instance.
+
+        Parameters
+        ----------
+        filename : str
+            The netCDF file name
+        timeidx : optional, int or slice()
+            The time index of variables.
+            Default is None, and it would use `slice(0, None)`, the all time index.
+        """
         self.variables = {}
         self.filename = filename
         self.ncfile = Dataset(filename)
+
+        if timeidx is None:
+            self.timeidx = slice(0, None)
+        elif isinstance(timeidx, (slice, int)):
+            self.timeidx = timeidx
+        else:
+            raise ValueError(f"Unavailable timeidx type: {type(timeidx)}")
         
         if self.ncfile.dimensions['Time'].size == 1:
             self._func = {
@@ -30,9 +47,21 @@ class GetVar:
                 'slp': dcomputeseaprs_nt
             }
 
-    def close(self):
-        """close netCDF file instance"""
-        self.ncfile.close()
+    def close(self, ncfile=True, variables=False):
+        """
+        Close attribute of GetVar instance.
+
+        Parameters
+        ----------
+        ncfile : optional, bool
+            Close GetVar.ncfile or not. Default is True.
+        variables : optional, bool
+            Delete GetVar.variables or not. Default is False.
+        """
+        if ncfile:
+            self.ncfile.close()
+        elif variables:
+            del self.variables
         
     def _tk(self, func_tk):
         p = self.get('P')
@@ -80,7 +109,18 @@ class GetVar:
         return slp
 
     def get(self, var_name):
-        """Get variable by its name."""
+        """
+        Get variable by its name.
+
+        Parameters
+        ----------
+        var_name : str
+            Variable name.
+            It can be the variable name of the netCDF file, or some diagnosis variables
+            list below:
+                'slp'  --  Sea Level Pressure
+                'tk'   --  Temperature (unit: K)
+        """
         
         if var_name in self.variables.keys():
             # get variable from cache
@@ -90,7 +130,7 @@ class GetVar:
         else:
             if var_name in self.ncfile.variables.keys():
                 # read variable from (wrfout) netCDF file
-                var = self.ncfile.variables[var_name][:]
+                var = self.ncfile.variables[var_name][self.timeidx]
                 
             else:
                 # calculate diagnois variable from fortran
