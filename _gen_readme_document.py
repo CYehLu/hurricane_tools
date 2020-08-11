@@ -397,6 +397,7 @@ class DocumentContent:
             full_doc = method_info[2]
             
             method_name = method_name.replace('_', '\_')
+            args = args.replace('*', '\*')
             
             write_content.append(f'<span style="color:#cca99b">{name}</span>.<span style="color:#a77864">**{method_name}**</span>**{args}**\n')
             write_content.append(f'{full_doc}')

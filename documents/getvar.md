@@ -84,7 +84,7 @@ class <span style="color:#a77864">**Interpz3d**</span>
             interpolated pressure levels
 
   
-<span style="color:#cca99b">Interpz3d</span>.<span style="color:#a77864">**interp**</span>**(self, *var)**
+<span style="color:#cca99b">Interpz3d</span>.<span style="color:#a77864">**interp**</span>**(self, \*var)**
 
         Interpolate
         
