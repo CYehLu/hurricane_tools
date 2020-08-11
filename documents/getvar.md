@@ -53,6 +53,51 @@ class <span style="color:#a77864">**GetVar**</span>
             list below:
                 'slp'  --  Sea Level Pressure
                 'tk'   --  Temperature (unit: K)
+                'pres' --  Pressure (unit: hPa)
+                'avo'  --  Absolute Vorticity
+                'pvo'  --  Potential Vorticity
+                'dbz'  --  Radar Reflectivity 
+
+  
+******
+class <span style="color:#a77864">**Interpz3d**</span>
+
+    Interpolating variables on pressure coordinate.
+
+
+
+| Methods | Description |
+| :------ | :---------- |
+| <font color="#a77864"> **\_\_init\_\_** </font> | Initialize with pressure and levels. |
+| <font color="#a77864"> **interp** </font> | Interpolate |
+
+
+<span style="color:#cca99b">Interpz3d</span>.<span style="color:#a77864">**\_\_init\_\_**</span>**(self, pres, level)**
+
+        Initialize with pressure and levels.
+        
+        Parameter
+        ---------
+        pres : 3-d array, shape = (nz, ny, nx)
+            pressure
+        level : scalar or 1-d array with shape = (nlev,)
+            interpolated pressure levels
+
+  
+<span style="color:#cca99b">Interpz3d</span>.<span style="color:#a77864">**interp**</span>**(self, *var)**
+
+        Interpolate
+        
+        Parameter
+        ---------
+        *var : 3-d array, shape = (nz, ny, nx)
+            Interpolated variables. Their shapes should be the same.
+            
+        Return
+        ------
+        If len(var) == 1, it would return a interpolated variable with shape = (nlev, ny, nx)
+        If len(var) > 1, it would return a list which elements are interpolated variable and
+        shape = (nlev, ny, nx).
 
   
 ******
