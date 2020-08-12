@@ -9,11 +9,24 @@
 !!
 
 
-subroutine calcdbz(prs, tmk, qvp, qra, qsn, qgr, sn0, ivarint, iliqskin, dbz, nx, ny, nz)
+SUBROUTINE CALCDBZ(nx, ny, nz, prs, tmk, qvp, qra, qsn, qgr, sn0, ivarint, iliqskin, dbz)
+    !!
+    !! nx, ny, nz: spatial dimension
+    !! prs: pressure (unit: Pa)
+    !! tm: temperature (unit: K)
+    !! qvp: QVAPOR, water vapor mixing ratio (unit: kg/kg)
+    !! qra: QRAIN, rain water mixing ratio (unit: kg/kg)
+    !! qsn: QSNOW, snow water mixing ratio (unit: kg/kg)
+    !! qgr: QGRAUP, graupel mixing ratio (unit: kg/kg)
+    !! sn0: 1 or 0, if qsn is all 0 or not
+    !! ivarint: 1 or 0, variable intercept parameters
+    !! iliqskin: 1 or 0. if is 1, frozen particles that are at a temperature above 
+    !!           freezing are assumed to scatter as a liquid particle
+    !!
+
     IMPLICIT NONE
 
     !f2py threadsafe
-    !f2py intent(in,out) :: dbz
     
     !   Constants
     REAL(KIND=8), PARAMETER :: GAMMA_SEVEN = 720.D0
@@ -30,13 +43,13 @@ subroutine calcdbz(prs, tmk, qvp, qra, qsn, qgr, sn0, ivarint, iliqskin, dbz, nx
     !   Arguments
     INTEGER, INTENT(IN) :: nx, ny, nz
     INTEGER, INTENT(IN) :: sn0, ivarint, iliqskin
-    REAL(KIND=8), DIMENSION(nx,ny,nz), INTENT(OUT) :: dbz
     REAL(KIND=8), DIMENSION(nx,ny,nz), INTENT(IN) :: prs
     REAL(KIND=8), DIMENSION(nx,ny,nz), INTENT(IN) :: tmk
     REAL(KIND=8), DIMENSION(nx,ny,nz), INTENT(INOUT) :: qvp
     REAL(KIND=8), DIMENSION(nx,ny,nz), INTENT(INOUT) :: qra
     REAL(KIND=8), DIMENSION(nx,ny,nz), INTENT(INOUT) :: qsn
     REAL(KIND=8), DIMENSION(nx,ny,nz), INTENT(INOUT) :: qgr
+    REAL(KIND=8), DIMENSION(nx,ny,nz), INTENT(OUT) :: dbz
 
 !NCLEND
 
@@ -176,3 +189,34 @@ subroutine calcdbz(prs, tmk, qvp, qra, qsn, qgr, sn0, ivarint, iliqskin, dbz, nx
     RETURN
 
 END SUBROUTINE CALCDBZ
+
+
+subroutine calcdbz_nt(nx, ny, nz, nt, prs, tmk, qvp, qra, qsn, qgr, sn0, ivarint, iliqskin, dbz)
+    implicit none
+    
+    ! arguments
+    integer, intent(in) :: nx, ny, nz, nt
+    integer, intent(in) :: sn0, ivarint, iliqskin
+    real(kind=8), dimension(nx,ny,nz,nt), intent(in) :: prs
+    real(kind=8), dimension(nx,ny,nz,nt), intent(in) :: tmk
+    real(kind=8), dimension(nx,ny,nz,nt), intent(inout) :: qvp
+    real(kind=8), dimension(nx,ny,nz,nt), intent(inout) :: qra
+    real(kind=8), dimension(nx,ny,nz,nt), intent(inout) :: qsn
+    real(kind=8), dimension(nx,ny,nz,nt), intent(inout) :: qgr
+    real(kind=8), dimension(nx,ny,nz,nt), intent(out) :: dbz
+    
+    ! local variables
+    integer :: it
+    
+    do it = 1, nt
+        call calcdbz(                              &
+            nx, ny, nz,                            &
+            prs(:,:,:,it), tmk(:,:,:,it),          &
+            qvp(:,:,:,it), qra(:,:,:,it), qsn(:,:,:,it), qgr(:,:,:,it),    &
+            sn0, ivarint, iliqskin,                &
+            dbz(:,:,:,it)                          &
+            )
+    end do
+    
+    return
+end subroutine calcdbz_nt
