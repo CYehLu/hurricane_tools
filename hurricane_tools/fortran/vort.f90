@@ -1,6 +1,12 @@
-!!!
-!!! https://github.com/NCAR/wrf-python/blob/develop/fortran/wrf_pvo.f90
-!!!
+!!
+!! This fortran code is modified from wrf-python:
+!! https://github.com/NCAR/wrf-python/blob/develop/fortran/wrf_pvo.f90
+!!
+!! Chun-Yeh Lu, NTU, window120909120909@gmail.com
+!! 2020-08-12
+!! This file is compiled by:
+!!     f2py -c --opt='-O3' --f90flags='-fopenmp' -lgomp vort.f90 -m f90vort
+!!
 
 
 !NCLFORTSTART
@@ -10,7 +16,6 @@ SUBROUTINE DCOMPUTEABSVORT(av, u, v, msfu, msfv, msft, cor, dx, dy, nx, ny, nz,&
     IMPLICIT NONE
 
     !f2py threadsafe
-    !f2py intent(in,out) :: av
 
     INTEGER, INTENT(IN) :: nx, ny, nz, nxp1, nyp1
     REAL(KIND=8), DIMENSION(nxp1,ny,nz), INTENT(IN) :: u
@@ -60,13 +65,15 @@ END SUBROUTINE DCOMPUTEABSVORT
 !NCLFORTSTART
 SUBROUTINE DCOMPUTEPV(pv, u, v, theta, prs, msfu, msfv, msft, cor, dx, dy, nx, &
                       ny, nz, nxp1, nyp1)
-    USE wrf_constants, ONLY : G
 
     IMPLICIT NONE
 
     !f2py threadsafe
-    !f2py intent(in,out) :: pv
-
+    
+    ! constant
+    REAL(KIND=8), PARAMETER :: G = 9.81D0
+    
+    ! arguments
     INTEGER,INTENT(IN) :: nx, ny, nz, nxp1, nyp1
     REAL(KIND=8), DIMENSION(nxp1,ny,nz), INTENT(IN) :: u
     REAL(KIND=8), DIMENSION(nx,nyp1,nz), INTENT(IN) :: v
@@ -123,3 +130,72 @@ SUBROUTINE DCOMPUTEPV(pv, u, v, theta, prs, msfu, msfv, msft, cor, dx, dy, nx, &
     RETURN
 
 END SUBROUTINE DCOMPUTEPV
+
+
+subroutine dcomputeabsvort_nt(av, u, v, msfu, msfv, msft, cor, dx, dy, nx, ny, nz, nt, nxp1, nyp1)
+    implicit none
+
+    ! arguments 
+    integer, intent(in) :: nx, ny, nz, nt, nxp1, nyp1
+    real(kind=8), dimension(nxp1,ny,nz,nt), intent(in) :: u
+    real(kind=8), dimension(nx,nyp1,nz,nt), intent(in) :: v
+    real(kind=8), dimension(nx,ny,nz,nt), intent(out) :: av
+    real(kind=8), dimension(nxp1,ny,nt), intent(in):: msfu
+    real(kind=8), dimension(nx,nyp1,nt), intent(in) :: msfv
+    real(kind=8), dimension(nx,ny,nt), intent(in) :: msft
+    real(kind=8), dimension(nx,ny,nt), intent(in) :: cor
+    real(kind=8) :: dx, dy
+    
+    ! local variable
+    integer :: it
+    
+    do it = 1, nt
+        call dcomputeabsvort(                      &
+                 av(:,:,:,it),                     &
+                 u(:,:,:,it), v(:,:,:,it),         &
+                 msfu(:,:,it), msfv(:,:,it), msft(:,:,it),    &
+                 cor(:,:,it),                      &
+                 dx, dy,                           &
+                 nx, ny, nz,                       &
+                 nxp1, nyp1                        &
+             )
+    end do
+    
+    return
+end subroutine dcomputeabsvort_nt
+
+
+subroutine dcomputepv_nt(pv, u, v, theta, prs, msfu, msfv, msft, cor, dx, dy, nx, ny, nz, nt, nxp1, nyp1)
+    implicit none
+    
+    ! arguments
+    integer, intent(in) :: nx, ny, nz, nt, nxp1, nyp1
+    real(kind=8), dimension(nxp1,ny,nz,nt), intent(in) :: u
+    real(kind=8), dimension(nx,nyp1,nz,nt), intent(in) :: v
+    real(kind=8), dimension(nx,ny,nz,nt), intent(in) :: prs
+    real(kind=8), dimension(nx,ny,nz,nt), intent(in) :: theta
+    real(kind=8), dimension(nx,ny,nz,nt), intent(out) :: pv
+    real(kind=8), dimension(nxp1,ny,nt), intent(in) ::  msfu
+    real(kind=8), dimension(nx,nyp1,nt), intent(in) :: msfv
+    real(kind=8), dimension(nx,ny,nt), intent(in) :: msft
+    real(kind=8), dimension(nx,ny,nt), intent(in) :: cor
+    real(kind=8) :: dx,dy
+    
+    ! local variable
+    integer :: it
+    
+    do it = 1, nt
+        call dcomputepv(                             &
+                 pv(:,:,:,it),                       &
+                 u(:,:,:,it), v(:,:,:,it),           &
+                 theta(:,:,:,it), prs(:,:,:,it),     &
+                 msfu(:,:,it), msfv(:,:,it), msft(:,:,it),     &
+                 cor(:,:,it),                        &
+                 dx, dy,                             &
+                 nx, ny, nz,                         &
+                 nxp1, nyp1                          &
+             )
+    end do
+
+    return
+end subroutine dcomputepv_nt
