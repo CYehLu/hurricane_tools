@@ -163,7 +163,7 @@ class Interpz3d:
     Interpolating variables on pressure coordinate.
     """
     
-    def __init__(self, pres, level):
+    def __init__(self, pres, level, missing_value=np.nan):
         """
         Initialize with pressure and levels.
         
@@ -173,9 +173,12 @@ class Interpz3d:
             pressure
         level : scalar or 1-d array with shape = (nlev,)
             interpolated pressure levels
+        missing_value : scalar, optional
+            Assign missing value. Default is `np.nan`
         """
         self.pres = pres
         self.level = level
+        self.missing_value = missing_value
         
         if isinstance(level, (int, float)):
             find_level_func = find_level_1
@@ -186,7 +189,7 @@ class Interpz3d:
         else:
             raise ValueError(f"Unavailable `level` type : {type(level)}")
             
-        # convert to fortran type and shape from `zyx` to `zyz`
+        # convert to fortran type and shape from `zyx` to `xyz`
         self._pres_f = np.asfortranarray(pres).T
         
         # find level index, shape = (nx, ny, nlev)
@@ -211,6 +214,7 @@ class Interpz3d:
         pres_f = self._pres_f
         interpz3d_func = self._interpz3d_func
         level = self.level
+        missing_value = self.missing_value
         
         if len(var) == 1:
             v_f = np.asfortranarray(var[0]).T
@@ -224,7 +228,7 @@ class Interpz3d:
             for v in var:
                 v_f = np.asfortranarray(v).T
                 v_interp = interpz3d_func(v_f, pres_f, level, lev_idx)   # (nx, ny, nlev)
-                v_interp[lev_idx == 0] = np.nan
+                v_interp[lev_idx == 0] = missing_value
                 var_interp.append(v_interp.T)
             
             return var_interp

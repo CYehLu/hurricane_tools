@@ -72,7 +72,7 @@ class <span style="color:#a77864">**Interpz3d**</span>
 | <font color="#a77864"> **interp** </font> | Interpolate |
 
 
-<span style="color:#cca99b">Interpz3d</span>.<span style="color:#a77864">**\_\_init\_\_**</span>**(self, pres, level)**
+<span style="color:#cca99b">Interpz3d</span>.<span style="color:#a77864">**\_\_init\_\_**</span>**(self, pres, level, missing_value=np.nan)**
 
         Initialize with pressure and levels.
         
@@ -82,6 +82,8 @@ class <span style="color:#a77864">**Interpz3d**</span>
             pressure
         level : scalar or 1-d array with shape = (nlev,)
             interpolated pressure levels
+        missing_value : scalar, optional
+            Assign missing value. Default is `np.nan`
 
   
 <span style="color:#cca99b">Interpz3d</span>.<span style="color:#a77864">**interp**</span>**(self, \*var)**
