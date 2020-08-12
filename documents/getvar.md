@@ -54,9 +54,9 @@ class <span style="color:#a77864">**GetVar**</span>
                 'slp'  --  Sea Level Pressure
                 'tk'   --  Temperature (unit: K)
                 'pres' --  Pressure (unit: hPa)
-                'avo'  --  Absolute Vorticity
-                'pvo'  --  Potential Vorticity
                 'dbz'  --  Radar Reflectivity 
+                'avo'  --  Absolute Vorticity (unit: 10-5 s-1)
+                'pvo'  --  Potential Vorticity
 
   
 ******
