@@ -51,12 +51,13 @@ class <span style="color:#a77864">**GetVar**</span>
             Variable name.
             It can be the variable name of the netCDF file, or some diagnosis variables
             list below:
-                'slp'  --  Sea Level Pressure
-                'tk'   --  Temperature (unit: K)
-                'pres' --  Pressure (unit: hPa)
-                'dbz'  --  Radar Reflectivity 
-                'avo'  --  Absolute Vorticity (unit: 10-5 s-1)
-                'pvo'  --  Potential Vorticity
+                'slp'   --  Sea Level Pressure
+                'tk'    --  Temperature (unit: K)
+                'pres'  --  Pressure (unit: hPa)
+                'geopt' --  Geopotential (unit: m2 s-2)
+                'dbz'   --  Radar Reflectivity 
+                'avo'   --  Absolute Vorticity (unit: 10-5 s-1)
+                'pvo'   --  Potential Vorticity (unit: PVU)
 
   
 ******

@@ -122,6 +122,9 @@ class GetVar:
     def _pres(self):
         return 0.01 * (self.get('P') + self.get('PB'))
     
+    def _geopt(self):
+        return self.get('PH') + self.get('PHB')
+    
     def _dbz(self, func_dbz, use_varint=False, use_liqskin=False):
         # get necessary variables
         pres = np.squeeze(self.get('pres')) * 100   # hPa to Pa
@@ -218,12 +221,13 @@ class GetVar:
             Variable name.
             It can be the variable name of the netCDF file, or some diagnosis variables
             list below:
-                'slp'  --  Sea Level Pressure
-                'tk'   --  Temperature (unit: K)
-                'pres' --  Pressure (unit: hPa)
-                'dbz'  --  Radar Reflectivity 
-                'avo'  --  Absolute Vorticity (unit: 10-5 s-1)
-                'pvo'  --  Potential Vorticity
+                'slp'   --  Sea Level Pressure
+                'tk'    --  Temperature (unit: K)
+                'pres'  --  Pressure (unit: hPa)
+                'geopt' --  Geopotential (unit: m2 s-2)
+                'dbz'   --  Radar Reflectivity 
+                'avo'   --  Absolute Vorticity (unit: 10-5 s-1)
+                'pvo'   --  Potential Vorticity (unit: PVU)
         """
         
         if var_name in self.variables.keys():
@@ -244,6 +248,8 @@ class GetVar:
                     var = self._tk(self._func['tk'])
                 elif var_name == 'pres':
                     var = self._pres()
+                elif var_name == 'geopt':
+                    var = self._geopt()
                 elif var_name == 'dbz':
                     var = self._dbz(self._func['dbz'])
                 elif var_name == 'avo':
