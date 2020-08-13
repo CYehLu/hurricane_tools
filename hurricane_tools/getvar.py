@@ -11,8 +11,9 @@ from .fortran.f90vort import dcomputeabsvort, dcomputepv, dcomputeabsvort_nt, dc
 
 class GetVar:
     """
-    Get variables. It is similar to `wrf.getvar` by wrf-python,
-    but here I store every intermediate variables to speed up.
+    Get variables. It is similar to `wrf.getvar` by wrf-python, but here I 
+    store every intermediate variables, reduce the amount of function calling
+    and rewrite the fortran functions to speed up.
     """
     
     def __init__(self, filename, timeidx=None):
@@ -268,39 +269,46 @@ class GetVar:
 class Interpz3d:
     """
     Interpolating variables on pressure coordinate.
+    
+    Example
+    -------
+    >>> u, v, phi, temp, pres = get_data()          # a fake function to get data
+    >>> interp_obj = Interpz3d(pres, [900, 850])    # interpolate variables on 900 and 850 hPa
+    >>> u850, v850, phi850, temp850 = interp_obj(u, v, phi, temp)   
+    >>> u850.shape     # (2, ny, nx)
     """
     
-    def __init__(self, pres, level, missing_value=np.nan):
+    def __init__(self, zdata, level, missing_value=np.nan):
         """
         Initialize with pressure and levels.
         
         Parameter
         ---------
-        pres : 3-d array, shape = (nz, ny, nx)
-            pressure
-        level : scalar or 1-d array with shape = (nlev,)
-            interpolated pressure levels
+        zdata : 3-d array, shape = (nz, ny, nx)
+            vertical coordinate variable. e.g pressure
+        level : scalar, or 1-d array-like with shape = (nlev,)
+            interpolated `zdata` levels
         missing_value : scalar, optional
             Assign missing value. Default is `np.nan`
         """
-        self.pres = pres
-        self.level = level
+        self.zdata = zdata
+        self.level = np.array(level)
         self.missing_value = missing_value
         
         if isinstance(level, (int, float)):
             find_level_func = find_level_1
             self._interpz3d_func = interpz3d_1
-        elif isinstance(level, np.ndarray):
+        elif isinstance(level, (list, np.ndarray)):
             find_level_func = find_level_n
             self._interpz3d_func = interpz3d_n
         else:
             raise ValueError(f"Unavailable `level` type : {type(level)}")
             
         # convert to fortran type and shape from `zyx` to `xyz`
-        self._pres_f = np.asfortranarray(pres).T
+        self._zdata_f = np.asfortranarray(zdata.T)
         
         # find level index, shape = (nx, ny, nlev)
-        self._lev_idx = find_level_func(self._pres_f, level)
+        self._lev_idx = find_level_func(self._zdata_f, level)
     
     def interp(self, *var):
         """
@@ -318,25 +326,27 @@ class Interpz3d:
         shape = (nlev, ny, nx).
         """
         lev_idx = self._lev_idx
-        pres_f = self._pres_f
+        zdata_f = self._zdata_f
         interpz3d_func = self._interpz3d_func
         level = self.level
         missing_value = self.missing_value
+        nz = zdata_f.shape[-1]
         
         if len(var) == 1:
-            v_f = np.asfortranarray(var[0]).T
-            v_interp = interpz3d_func(v_f, pres_f, level, lev_idx)   # (nx, ny)
+            v_f = np.asfortranarray(var[0].T)
+            v_interp = interpz3d_func(v_f, zdata_f, level, lev_idx)   # (nx, ny)
             v_interp[lev_idx == 0] = np.nan
+            v_interp[lev_idx == nz] = np.nan
             return v_interp.T
         
         else:
             var_interp = []
         
             for v in var:
-                v_f = np.asfortranarray(v).T
-                v_interp = interpz3d_func(v_f, pres_f, level, lev_idx)   # (nx, ny, nlev)
+                v_f = np.asfortranarray(v.T)
+                v_interp = interpz3d_func(v_f, zdata_f, level, lev_idx)   # (nx, ny, nlev)
                 v_interp[lev_idx == 0] = missing_value
+                v_interp[lev_idx == nz] = missing_value
                 var_interp.append(v_interp.T)
             
             return var_interp
-            

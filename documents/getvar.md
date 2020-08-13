@@ -4,8 +4,9 @@
 
 class <span style="color:#a77864">**GetVar**</span>
 
-    Get variables. It is similar to `wrf.getvar` by wrf-python,
-    but here I store every intermediate variables to speed up.
+    Get variables. It is similar to `wrf.getvar` by wrf-python, but here I 
+    store every intermediate variables, reduce the amount of function calling
+    and rewrite the fortran functions to speed up.
 
 
 
@@ -64,6 +65,13 @@ class <span style="color:#a77864">**GetVar**</span>
 class <span style="color:#a77864">**Interpz3d**</span>
 
     Interpolating variables on pressure coordinate.
+    
+    Example
+    -------
+    >>> u, v, phi, temp, pres = get_data()          # a fake function to get data
+    >>> interp_obj = Interpz3d(pres, [900, 850])    # interpolate variables on 900 and 850 hPa
+    >>> u850, v850, phi850, temp850 = interp_obj(u, v, phi, temp)   
+    >>> u850.shape     # (2, ny, nx)
 
 
 
@@ -73,16 +81,16 @@ class <span style="color:#a77864">**Interpz3d**</span>
 | <font color="#a77864"> **interp** </font> | Interpolate |
 
 
-<span style="color:#cca99b">Interpz3d</span>.<span style="color:#a77864">**\_\_init\_\_**</span>**(self, pres, level, missing_value=np.nan)**
+<span style="color:#cca99b">Interpz3d</span>.<span style="color:#a77864">**\_\_init\_\_**</span>**(self, zdata, level, missing_value=np.nan)**
 
         Initialize with pressure and levels.
         
         Parameter
         ---------
-        pres : 3-d array, shape = (nz, ny, nx)
-            pressure
-        level : scalar or 1-d array with shape = (nlev,)
-            interpolated pressure levels
+        zdata : 3-d array, shape = (nz, ny, nx)
+            vertical coordinate variable. e.g pressure
+        level : scalar, or 1-d array-like with shape = (nlev,)
+            interpolated `zdata` levels
         missing_value : scalar, optional
             Assign missing value. Default is `np.nan`
 

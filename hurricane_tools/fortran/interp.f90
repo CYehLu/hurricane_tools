@@ -4,9 +4,9 @@
 
 !!! subroutine list:
 !!!     find_level_1(nx, ny, nz, zdata, level, out)
-!!!         find the index of level 
+!!!         find the index of (one) level 
 !!!     find_level_n(nx, ny, nz, zdata, nlev, levels, out)
-!!!         find the index of levels
+!!!         find the index of (multiple) levels
 !!!     interpz3d_1(nx, ny, nz, var, zdata, level, lev_idx, var_interp)
 !!!         interpolating 3d variable on a vertical level
 !!!     interpz3d_n(nx, ny, nz, var, zdata, nlev, levels, lev_idx, var_interp)
@@ -25,8 +25,7 @@ subroutine find_level_1(nx, ny, nz, zdata, level, out)
     !! nx, ny, nz : 
     !!     spatial dimension
     !! zdata(nx, ny, nz) : 
-    !!     vertical coordinate, e.g pressure
-    !!     `zdata` must be descent order, that is zdata(i, j, z) < zdata(i, j, z+1).
+    !!     vertical coordinate, e.g pressure or height
     !! levels : 
     !!     interpolating level
     !!
@@ -35,6 +34,7 @@ subroutine find_level_1(nx, ny, nz, zdata, level, out)
     !! out(nx, ny) : 
     !!     the level information. For example, if out(i, j) = 5, it means 
     !!     that zdata(i, j, 5) <= level < zdata(i, j, 6)
+    !!     if out(i,j) = 0 or nz, it means that the level is out of the range of zdata
     
     implicit none
     
@@ -47,15 +47,48 @@ subroutine find_level_1(nx, ny, nz, zdata, level, out)
     ! local variables
     integer :: i, j, k
     
-    do i = 1, nx
-        do j = 1, ny  
-            k = 1
-            do while ((zdata(i,j,k) >= level) .and. (k <= nz))
-                k = k + 1
-            end do    
-            out(i,j) = k - 1
+    
+    if (zdata(1,1,1) > zdata(1,1,nz)) then
+        ! for zdata is descent order, like pressure
+        
+        do i = 1, nx
+            do j = 1, ny  
+                k = 1
+                do while ((k <= nz) .and. (zdata(i,j,k) >= level))
+                    k = k + 1
+                end do    
+                out(i,j) = k - 1
+            end do
         end do
-    end do
+        
+    else
+        ! for zdata is ascent order, like height
+        ! condition in while loop is slightly different to descent case, because
+        ! considering the potential-temperature vertical level situation (potential
+        ! temperature can not be guaranteed to be monotonically increasing).
+        
+        do i = 1, nx
+            do j =1, ny
+            
+                if (zdata(i,j,nz) <= level) then
+                    out(i,j) = nz
+                    exit
+                end if
+            
+                k = nz - 1
+                do while (k > 0)
+                    if ((zdata(i,j,k) <= level) .and. (zdata(i,j,k+1) > level)) then
+                        exit
+                    else
+                        k = k - 1
+                    end if
+                end do
+                out(i,j) = k
+                
+            end do
+        end do
+    
+    end if
     
     return 
 end subroutine find_level_1
@@ -71,8 +104,7 @@ subroutine find_level_n(nx, ny, nz, zdata, nlev, levels, out)
     !! nx, ny, nz : 
     !!     spatial dimension
     !! zdata(nx, ny, nz) : 
-    !!     vertical coordinate, e.g pressure
-    !!     `zdata` must be descent order, that is zdata(i, j, z) < zdata(i, j, z+1).
+    !!     vertical coordinate, e.g pressure or height
     !! nlev : 
     !!     number of interpolating levels
     !! levels(nlev) : 
@@ -83,6 +115,7 @@ subroutine find_level_n(nx, ny, nz, zdata, nlev, levels, out)
     !! out(nx, ny, nlev) : 
     !!     the level information. For example, if out(i, j, ilev) = 5, 
     !!     it means that zdata(i, j, 5) <= levels(ilev) < zdata(i, j, 6)
+    !!     if out(i,j,ilev) = 0 or nz, it means that the level is out of the range of zdata
     
     implicit none
     
@@ -125,15 +158,14 @@ subroutine interpz3d_1(nx, ny, nz, var, zdata, level, lev_idx, var_interp)
     
     do i = 1, nx
         do j = 1, ny
-            idx = lev_idx(i,j)
-            
-            ! if 可以拿掉?
-            !if ((idx .ne. 0) .and. (idx .ne. nz)) then
+            if ((lev_idx(i,j) .ne. 0) .and. (lev_idx(i,j) .ne. nz)) then
+                idx = lev_idx(i,j)
                 w1 = (level - zdata(i,j,idx+1)) / (zdata(i,j,idx) - zdata(i,j,idx+1))
                 w2 = 1 - w1
                 var_interp(i,j) = w1 * var(i,j,idx) + w2 * var(i,j,idx+1)
-            !end if
-            
+            else
+                var_interp(i,j) = -99999999.
+            end if
         end do
     end do
     

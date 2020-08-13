@@ -67,7 +67,7 @@ getvar
 
 | Function / Class | Description |
 | :--------------- | :---------- |
-| <font color="#a77864"> **GetVar** </font> | Get variables. It is similar to `wrf.getvar` by wrf-python, but here I store every intermediate variables to speed up. |
+| <font color="#a77864"> **GetVar** </font> | Get variables. It is similar to `wrf.getvar` by wrf-python, but here I store every intermediate variables, reduce the amount of function calling and rewrite the fortran functions to speed up. |
 | <font color="#a77864"> **Interpz3d** </font> | Interpolating variables on pressure coordinate. |
 
 
