@@ -268,7 +268,7 @@ class GetVar:
         
 class Interpz3d:
     """
-    Interpolating variables on pressure coordinate.
+    Interpolating variables on specified vertical coordinate.
     
     Example
     -------

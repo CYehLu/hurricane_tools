@@ -64,7 +64,7 @@ class <span style="color:#a77864">**GetVar**</span>
 ******
 class <span style="color:#a77864">**Interpz3d**</span>
 
-    Interpolating variables on pressure coordinate.
+    Interpolating variables on specified vertical coordinate.
     
     Example
     -------
