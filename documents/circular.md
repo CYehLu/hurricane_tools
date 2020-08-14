@@ -87,7 +87,7 @@
 ******
 <span style="color:#a77864">**circular_avg_closure**</span>**(lon, lat, clon, clat, radius, dxdy=None, \*\*kwargs)**
 
-    Calculate circular mean.
+    Return a closure function to calculate circular mean.
     
     This function is very similar to `circular_avg`, while this function returns
     a closure function which use `values` as its parameters.
@@ -100,7 +100,24 @@
     
     Returs:
     ------
-    a closure function
+    A closure function, which its parameter is `values` and return the interpolateing
+    result (see `circular_avg` for `values`).
+    
+    Example:
+    -------
+    >>> # using `circular_avg`
+    >>> res1 = circular_avg(lon, lat, val1, clon, clat, radius)
+    >>> res2 = circular_avg(lon, lat, val2, clon, clat, radius)
+    >>> 
+    >>> # using `circular_avg_closure`
+    >>> cavg_func = circular_avg_closure(lon, lat, clon, clat, radius)
+    >>> res1_closure = cavg_func(val1)
+    >>> res2_closure = cavg_func(val2)
+    >>> 
+    >>> np.allclose(res1, res1_closure)
+    True
+    >>> np.allclose(res2, res2_closure)
+    True
 
 
 
