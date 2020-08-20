@@ -2,7 +2,7 @@
 
 [[source](.././hurricane_tools//circular.py)]  
 
-<span style="color:#a77864">**interp_circle**</span>**(X, Y, values, cx, cy, radius, theta=None, dxdy=None, coord='lonlat', \*\*kwargs)**
+<span style="color:#a77864">**interp_circle**</span>**(X, Y, values, cx, cy, radius, theta=None, dxdy=None, coord='lonlat')**
 
     Interpolating data on the circles.
     
@@ -30,11 +30,7 @@
         The coordinate system of `X` and `Y`.
         If coord = `xy`, then `X` and `Y` are cartesain coordinate.
         If coord = 'lonlat', then `X` and `Y` are longtitude and latitude.
-        Default is `lonlat`.
-    **kwargs: {method, fill_value, rescale}
-        The parameters used in scipy.interpolate.griddata.
-        Check document for griddata:
-        https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html
+        Default is `lonlat`.       
         
     Return:
     ------
@@ -43,7 +39,40 @@
 
 
 ******
-<span style="color:#a77864">**circular_avg**</span>**(lon, lat, values, clon, clat, radius, dxdy=None, \*\*kwargs)**
+<span style="color:#a77864">**interp_circle_closure**</span>**(X, Y, cx, cy, radius, theta=None, dxdy=None, coord='lonlat')**
+
+    Return a function, which can interpolate data on the circle.
+    
+    The Returned function accept a argument `values`, the data values on the `X` and `Y`
+    coordinate.
+    
+    These two methods are almost the same:
+    >>> # method 1: using `interp_circle` twice
+    >>> X, Y, cx, cy, radius, values1, values2 = get_fake_data()
+    >>> res1 = interp_circle(X, Y, values1, cx, cy, radius)
+    >>> res2 = interp_circle(X, Y, values2, cx, cy, radius)
+    >>>
+    >>> # method 2: using `interp_circle_closure`
+    >>> interp_func = interp_circle_closure(X, Y, cx, cy, radius)
+    >>> res1 = interp_func(values1)
+    >>> res2 = interp_func(values2)
+    
+    But the method 2 (using `interp_circle_closure`) is faster because it avoids some repeated 
+    calculations.
+    
+    Parameters:
+    ----------
+    X, Y, cx, cy, radius, theta, dxdy, coord:
+        See `interp_circle`
+        
+    Return:
+    ------
+    A function, which its argument is `values` (see `interp_circle`).
+
+
+
+******
+<span style="color:#a77864">**circular_avg**</span>**(lon, lat, values, clon, clat, radius, theta=None, dxdy=None)**
 
     Calculate circular mean.
     
@@ -57,20 +86,14 @@
         The center coordinates of circular mean.
     radius: scaler or 1-d array-like
         The radius of circles. Unit is km.
+    theta: 1-d array
+        The angles (radins) of each sampled points on the circle.
+        See `interp_circle`
+        Default is np.arange(*np.deg2rad([0, 360, 1])), the whole circle.
     dxdy: 2-elements tuple, (dx, dy). Optional
         Spatial resolution. 
         Default is None, and it would automatically derive dx and dy besed on `lon`
         and `lat`.
-        
-    **kwargs: {theta, method, fill_value, rescale}
-        theta: 1-d array
-            The angles (radians) of each sampled points on the circle.
-            See `interp_circle`.
-            Default is np.arange(*np.deg2rad([0, 360, 1])), the whole circle.
-        method, fill_value, rescale:
-            The parameters used in scipy.interpolate.griddata.
-            Check document for griddata:
-            https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html
             
     Returns:
     -------
@@ -85,7 +108,7 @@
 
 
 ******
-<span style="color:#a77864">**circular_avg_closure**</span>**(lon, lat, clon, clat, radius, dxdy=None, \*\*kwargs)**
+<span style="color:#a77864">**circular_avg_closure**</span>**(lon, lat, clon, clat, radius, theta=None, dxdy=None)**
 
     Return a closure function to calculate circular mean.
     
@@ -158,7 +181,7 @@
 
 
 ******
-<span style="color:#a77864">**axisymmetricity**</span>**(lon, lat, var, radius, clon, clat, dxdy=None, integ='trapz', \*\*kwargs)**
+<span style="color:#a77864">**axisymmetricity**</span>**(lon, lat, var, radius, clon, clat, dxdy=None, integ='trapz')**
 
     Calculate axisymmetricity based on Miyamoto and Takemi (2013).
     
@@ -179,8 +202,6 @@
         Numerical integration method. 'trapz' is trapezoidal method, and `simps` is Simpson’s
         method. 
         See scipy document: https://reurl.cc/X6KpYD
-    **kwargs : 
-        Keyword arguments for `circular_avg`
         
     Return:
     ------
@@ -192,6 +213,12 @@
         Axisymmetric Intensification of Tropical Cyclones"
         J. Atmos. Sci, 70, 112-129
         https://doi.org/10.1175/JAS-D-11-0285.1
+
+
+
+******
+<span style="color:#a77864">**axisymmetricity_closure**</span>**(lon, lat, radius, clon, clat, dxdy=None, integ='trapz')**
+
 
 
 

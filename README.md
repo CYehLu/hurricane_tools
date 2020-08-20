@@ -43,10 +43,12 @@ circular
 | Function / Class | Description |
 | :--------------- | :---------- |
 | <font color="#a77864"> **interp_circle** </font> | Interpolating data on the circles. |
+| <font color="#a77864"> **interp_circle_closure** </font> | Return a function, which can interpolate data on the circle. |
 | <font color="#a77864"> **circular_avg** </font> | Calculate circular mean. |
 | <font color="#a77864"> **circular_avg_closure** </font> | Return a closure function to calculate circular mean. |
 | <font color="#a77864"> **rmw** </font> | Find TC RMW |
 | <font color="#a77864"> **axisymmetricity** </font> | Calculate axisymmetricity based on Miyamoto and Takemi (2013). |
+| <font color="#a77864"> **axisymmetricity_closure** </font> |  |
 
 
 ******
