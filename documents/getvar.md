@@ -42,7 +42,7 @@ class <span style="color:#a77864">**GetVar**</span>
             Delete GetVar.variables or not. Default is False.
 
   
-<span style="color:#cca99b">GetVar</span>.<span style="color:#a77864">**get**</span>**(self, var_name)**
+<span style="color:#cca99b">GetVar</span>.<span style="color:#a77864">**get**</span>**(self, var_name, squeeze=True, filled=True)**
 
         Get variable by its name.
 
@@ -59,6 +59,22 @@ class <span style="color:#a77864">**GetVar**</span>
                 'dbz'   --  Radar Reflectivity 
                 'avo'   --  Absolute Vorticity (unit: 10-5 s-1)
                 'pvo'   --  Potential Vorticity (unit: PVU)
+                
+        squeeze : bool, default is True
+            Determine whether to squeeze the returned variable.
+            
+        filled : bool or scalar. Default is True.
+            Determine the filled value of returned variable, if it is a `MaskArray`.
+            
+            If filled = True:
+                Filled np.nan to variable. Returned variable type is `ndarray`.
+            If filled = False:
+                Do not fill any value to variable.
+                Returned variable type is `MaskArray` (if wrf-output-variable) or `ndarray` (if 
+                diagnois variable).
+            If filled = scalar (int or float):
+                Filled given value to variable. Returned variable type is `ndarray`.
+                When filled = np.nan, it is equivalent to filled = True.
 
   
 ******
@@ -70,7 +86,7 @@ class <span style="color:#a77864">**Interpz3d**</span>
     -------
     >>> u, v, phi, temp, pres = get_data()          # a fake function to get data
     >>> interp_obj = Interpz3d(pres, [900, 850])    # interpolate variables on 900 and 850 hPa
-    >>> u850, v850, phi850, temp850 = interp_obj(u, v, phi, temp)   
+    >>> u850, v850, phi850, temp850 = interp_obj.interp(u, v, phi, temp)   
     >>> u850.shape     # (2, ny, nx)
 
 

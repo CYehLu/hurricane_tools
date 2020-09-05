@@ -48,7 +48,7 @@ circular
 | <font color="#a77864"> **circular_avg_closure** </font> | Return a closure function to calculate circular mean. |
 | <font color="#a77864"> **rmw** </font> | Find TC RMW |
 | <font color="#a77864"> **axisymmetricity** </font> | Calculate axisymmetricity based on Miyamoto and Takemi (2013). |
-| <font color="#a77864"> **axisymmetricity_closure** </font> |  |
+| <font color="#a77864"> **axisymmetricity_closure** </font> | Return a closure function to calculate axisymmetricity (Miyamoto and Takemi 2013). |
 
 
 ******

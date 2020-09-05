@@ -203,7 +203,7 @@ def circular_avg_closure(lon, lat, clon, clat, radius, theta=None, dxdy=None):
     
     Returs:
     ------
-    A closure function, which its parameter is `values` and return the interpolateing
+    A closure function, which its parameter is `values` and return the calculation
     result (see `circular_avg` for `values`).
     
     Example:
@@ -336,6 +336,21 @@ def axisymmetricity(lon, lat, var, radius, clon, clat, dxdy=None, integ='trapz')
 
 def axisymmetricity_closure(lon, lat, radius, clon, clat, dxdy=None, integ='trapz'):
     """
+    Return a closure function to calculate axisymmetricity (Miyamoto and Takemi 2013).
+    
+    This function is very similar to `axisymmetricity`, while this function returns
+    a closure function which use `var` as its parameters.
+    This is suitable for the situations which needed to calculate axisymmetricity
+    repeatly, and only `var` are different, all other parameters remain the same.
+    
+    Parameters:
+    ----------
+    See `axisymmetricity`
+    
+    Returs:
+    ------
+    A closure function, which its parameter is `var` and return the calculation
+    result (see `axisymmetricity` for `var`).
     """
     if integ == 'trapz':
         int_func = trapz
