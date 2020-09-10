@@ -4,4 +4,4 @@ bst_all/
 hurricane_tools.egg-info
 *.so
 wrfout*
-f90*
+.f90*
