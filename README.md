@@ -63,6 +63,18 @@ distance
 
 
 ******
+fourier
+------
+[document](./documents/fourier.md) 
+
+| Function / Class | Description |
+| :--------------- | :---------- |
+| <font color="#a77864"> **interp_xy_closure** </font> | Interpolating data from radius-theta coordinate to x-y coordinate. |
+| <font color="#a77864"> **interp_xy** </font> |  |
+| <font color="#a77864"> **CircularFourier** </font> | Perform Fourier transformation on circles. |
+
+
+******
 getvar
 ------
 [document](./documents/getvar.md) 

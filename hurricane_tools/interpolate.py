@@ -2,6 +2,20 @@ import numpy as np
 from scipy.spatial import qhull
 
 
+##########################################################################
+##########################################################################
+##########################################################################
+### 2020/09/30 finding bug:
+###     In extrapolation case (`uv` exceeds the range of `xy`),
+###     the interpolated values would be unreasonable high in the
+###     area outside `xy`.
+###     Unresolved.
+###
+##########################################################################
+##########################################################################
+##########################################################################
+
+
 class FastGriddata:
     """
     Faster version of scipy.interpolate.griddata (in repeatly interpolating 
