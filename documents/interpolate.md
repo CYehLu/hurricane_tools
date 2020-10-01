@@ -61,25 +61,38 @@ class <span style="color:#a77864">**FastGriddata**</span>
 
 | Methods | Description |
 | :------ | :---------- |
-| <font color="#a77864"> **\_\_init\_\_** </font> | xy: grid points, shape = (n, 2) uv: interpolated points, shape = (m, 2) |
-| <font color="#a77864"> **\_\_call\_\_** </font> |  |
-| <font color="#a77864"> **interpolate** </font> | values: values on `xy` coordinates. shape = (n, 2) return interpolating result, shape = (m, 2) |
+| <font color="#a77864"> **\_\_init\_\_** </font> | Initialization for interpolation. |
+| <font color="#a77864"> **interpolate** </font> | Interpolate `values` to 'uv' coordinate. |
 
 
-<span style="color:#cca99b">FastGriddata</span>.<span style="color:#a77864">**\_\_init\_\_**</span>**(self, xy, uv, d=2)**
+<span style="color:#cca99b">FastGriddata</span>.<span style="color:#a77864">**\_\_init\_\_**</span>**(self, xy, uv, d=2, fill_value=np.nan)**
 
-        xy: grid points, shape = (n, 2)
-        uv: interpolated points, shape = (m, 2)
-
-  
-<span style="color:#cca99b">FastGriddata</span>.<span style="color:#a77864">**\_\_call\_\_**</span>**(self, values)**
-
+        Initialization for interpolation.
+        
+        Parameter
+        ---------
+        xy : 2-d array, shape = (n, 2)
+            Coordinate of `values` in `FastGriddata.interpolate`
+        uv : 2-d array, shape = (m, 2)
+            Coordinate of interpolation result.
+        d : int
+            Default is 2.
+        fill_value : scalar
+            Value used to fill in for the extrapolation points.
+            Default is `nan`.
 
   
 <span style="color:#cca99b">FastGriddata</span>.<span style="color:#a77864">**interpolate**</span>**(self, values)**
 
-        values: values on `xy` coordinates. shape = (n, 2)
-        return interpolating result, shape = (m, 2)
+        Interpolate `values` to 'uv' coordinate.
+        
+        Parameter
+        ---------
+        values : 2-d array, shape = (n, 2)
+        
+        Return
+        ------
+        2-d array, shape = (m, 2)
 
   
 ******

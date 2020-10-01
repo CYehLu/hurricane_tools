@@ -7,15 +7,6 @@ from hurricane_tools.interpolate import FastGriddata
 
 
 
-
-
-#################################################################
-#################################################################
-###### --------------------------------------------------- ######
-###### These two functions are not used because the bug in ######
-###### FastGriddata is not solved (extrapolation would     ######
-###### fail; calculating unreasonably high value).         ######
-###### --------------------------------------------------- ######
 def interp_xy_closure(radius, theta, x, y, center=None):
     """
     Interpolating data from radius-theta coordinate to x-y coordinate.
@@ -55,73 +46,6 @@ def interp_xy_closure(radius, theta, x, y, center=None):
 def interp_xy(radius, theta, values, x, y, center=None):
     interp_func = interp_xy_closure(radius, theta, x, y, center)
     return interp_func(values)
-###### --------------------------------------------------- ######
-######        This two functions above is not used         ######
-###### --------------------------------------------------- ######
-#################################################################
-#################################################################
-
-
-
-
-
-
-#################################################################
-#################################################################
-###### --------------------------------------------------- ######
-###### These two functions are just temporary substitute   ######
-###### of the above two functions.                         ######
-###### The structure isn't changed. Only thing difference  ######
-###### is that using `griddata` intead of `FastGridata`.   ######
-###### --------------------------------------------------- ######
-def interp_xy_closure(radius, theta, x, y, center=None):
-    """
-    Interpolating data from radius-theta coordinate to x-y coordinate.
-    """
-    if center is None:
-        cx = 0
-        cy = 0
-    else:
-        cx, cy = center
-        
-    if x.ndim != y.ndim:
-        raise ValueError(f"x.ndim ({x.ndim}) != y.ndim ({y.ndim})")
-    elif x.ndim >= 3 or y.ndim >= 3:
-        raise ValueError(f"x.ndim and y.ndim should <= 2")
-    else:
-        if x.ndim == 1 and y.ndim == 1:
-            X, Y = np.meshgrid(x, y)
-        elif x.ndim == 2 and y.ndim == 2:
-            X, Y = x, y
-            
-    t_mesh, r_mesh = np.meshgrid(theta, radius)
-    polar_coord = np.vstack((r_mesh.ravel(), t_mesh.ravel())).T
-    
-    interp_coord_r = np.sqrt((X-cx)**2 + (Y-cy)**2)
-    interp_coord_t = np.arctan2(Y-cy, X-cx)
-    interp_coord_t[interp_coord_t < 0] += 2 * np.pi
-    interp_coord = np.vstack((interp_coord_r.ravel(), interp_coord_t.ravel())).T
-    
-    def inner(values):
-        return griddata(polar_coord, values.ravel(), interp_coord).reshape(X.shape)
-    
-    return inner
-
-
-def interp_xy(radius, theta, values, x, y, center=None):
-    interp_func = interp_xy_closure(radius, theta, x, y, center)
-    return interp_func(values)
-###### --------------------------------------------------- ######
-###### --------------------------------------------------- ######
-###### --------------------------------------------------- ######
-#################################################################
-#################################################################
-
-
-
-
-
-
 
 
 

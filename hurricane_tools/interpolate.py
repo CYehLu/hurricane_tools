@@ -2,20 +2,6 @@ import numpy as np
 from scipy.spatial import qhull
 
 
-##########################################################################
-##########################################################################
-##########################################################################
-### 2020/09/30 finding bug:
-###     In extrapolation case (`uv` exceeds the range of `xy`),
-###     the interpolated values would be unreasonable high in the
-###     area outside `xy`.
-###     Unresolved.
-###
-##########################################################################
-##########################################################################
-##########################################################################
-
-
 class FastGriddata:
     """
     Faster version of scipy.interpolate.griddata (in repeatly interpolating 
@@ -72,26 +58,46 @@ class FastGriddata:
     True
     """
     
-    def __init__(self, xy, uv, d=2):
+    def __init__(self, xy, uv, d=2, fill_value=np.nan):
         """
-        xy: grid points, shape = (n, 2)
-        uv: interpolated points, shape = (m, 2)
+        Initialization for interpolation.
+        
+        Parameter
+        ---------
+        xy : 2-d array, shape = (n, 2)
+            Coordinate of `values` in `FastGriddata.interpolate`
+        uv : 2-d array, shape = (m, 2)
+            Coordinate of interpolation result.
+        d : int
+            Default is 2.
+        fill_value : scalar
+            Value used to fill in for the extrapolation points.
+            Default is `nan`.
         """
         tri = qhull.Delaunay(xy)
-        simplex = tri.find_simplex(uv)
+        simplex = tri.find_simplex(uv)       
         vertices = np.take(tri.simplices, simplex, axis=0)
         temp = np.take(tri.transform, simplex, axis=0)
         delta = uv - temp[:,d]
         bary = np.einsum('njk,nk->nj', temp[:,:d,:], delta)
-        self.vertices = vertices
-        self.weights = np.hstack((bary, 1 - bary.sum(axis=1, keepdims=True)))
         
-    def __call__(self, values):
-        pass
+        # calculate interpolation weights, and dealing with extrapolation points
+        weights = np.hstack((bary, 1 - bary.sum(axis=1, keepdims=True)))
+        weights[simplex == -1, :] = fill_value
+        
+        self.vertices = vertices
+        self.weights = weights
     
     def interpolate(self, values):
         """
-        values: values on `xy` coordinates. shape = (n, 2)
-        return interpolating result, shape = (m, 2)
+        Interpolate `values` to 'uv' coordinate.
+        
+        Parameter
+        ---------
+        values : 2-d array, shape = (n, 2)
+        
+        Return
+        ------
+        2-d array, shape = (m, 2)
         """
         return np.einsum('nj,nj->n', np.take(values, self.vertices), self.weights)
