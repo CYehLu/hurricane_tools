@@ -62,7 +62,7 @@ class <span style="color:#a77864">**FastGriddata**</span>
 | Methods | Description |
 | :------ | :---------- |
 | <font color="#a77864"> **\_\_init\_\_** </font> | Initialization for interpolation. |
-| <font color="#a77864"> **interpolate** </font> | Interpolate `values` to 'uv' coordinate. |
+| <font color="#a77864"> **interpolate** </font> | Interpolate `values` from `xy` coordinate to `uv` coordinate. |
 
 
 <span style="color:#cca99b">FastGriddata</span>.<span style="color:#a77864">**\_\_init\_\_**</span>**(self, xy, uv, d=2, fill_value=np.nan)**
@@ -84,7 +84,7 @@ class <span style="color:#a77864">**FastGriddata**</span>
   
 <span style="color:#cca99b">FastGriddata</span>.<span style="color:#a77864">**interpolate**</span>**(self, values)**
 
-        Interpolate `values` to 'uv' coordinate.
+        Interpolate `values` from `xy` coordinate to `uv` coordinate.
         
         Parameter
         ---------

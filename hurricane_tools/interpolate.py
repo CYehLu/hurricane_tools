@@ -90,7 +90,7 @@ class FastGriddata:
     
     def interpolate(self, values):
         """
-        Interpolate `values` to 'uv' coordinate.
+        Interpolate `values` from `xy` coordinate to `uv` coordinate.
         
         Parameter
         ---------
