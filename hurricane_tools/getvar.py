@@ -74,6 +74,12 @@ class GetVar:
         
         if variables:
             del self.variables
+            
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, type, value, traceback):
+        self.close(ncfile=True, variables=True)
         
     def _tk(self, func_tk):
         p = self.get('P')
