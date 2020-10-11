@@ -24,7 +24,7 @@ class GetVar:
         ----------
         filename : str
             The netCDF file name
-        timeidx : optional, int or slice()
+        timeidx : optional, int, list, or slice()
             The time index of variables.
             Default is None, and it would use `slice(0, None)`, the all time index.
         """
@@ -34,7 +34,7 @@ class GetVar:
 
         if timeidx is None:
             self.timeidx = slice(0, None)
-        elif isinstance(timeidx, (slice, int)):
+        elif isinstance(timeidx, (slice, int, list)):
             self.timeidx = timeidx
         else:
             raise ValueError(f"Unavailable timeidx type: {type(timeidx)}")
