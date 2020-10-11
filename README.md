@@ -52,6 +52,16 @@ circular
 
 
 ******
+destag
+------
+[document](./documents/destag.md) 
+
+| Function / Class | Description |
+| :--------------- | :---------- |
+| <font color="#a77864"> **destagger** </font> | Convert variable from staggered to unstagger grid. |
+
+
+******
 distance
 ------
 [document](./documents/distance.md) 

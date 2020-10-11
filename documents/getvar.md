@@ -25,7 +25,7 @@ class <span style="color:#a77864">**GetVar**</span>
         ----------
         filename : str
             The netCDF file name
-        timeidx : optional, int or slice()
+        timeidx : optional, int, list, or slice()
             The time index of variables.
             Default is None, and it would use `slice(0, None)`, the all time index.
 
