@@ -4,9 +4,9 @@ from netCDF4 import Dataset, MFDataset
 
 from .fortran.f90tk import calc_tk, calc_tk_nd
 from .fortran.f90slp import dcomputeseaprs, dcomputeseaprs_nt
-from .fortran.f90interp import find_level_1, find_level_n, interpz3d_1, interpz3d_n
 from .fortran.f90dbz import calcdbz, calcdbz_nt
 from .fortran.f90vort import dcomputeabsvort, dcomputepv, dcomputeabsvort_nt, dcomputepv_nt
+from .fortran.f90interp import find_level_1, find_level_n, calc_weights_1, calc_weights_n, interpz3d_1, interpz3d_n
 
 
 class GetVar:
@@ -325,25 +325,30 @@ class Interpz3d:
             interpolated `zdata` levels
         missing_value : scalar, optional
             Assign missing value. Default is `np.nan`
-        """
+        """     
         self.zdata = zdata
         self.level = np.array(level)
         self.missing_value = missing_value
         
         if isinstance(level, (int, float)):
             find_level_func = find_level_1
+            find_weight_func = calc_weights_1
             self._interpz3d_func = interpz3d_1
         elif isinstance(level, (list, np.ndarray)):
             find_level_func = find_level_n
+            find_weight_func = calc_weights_n
             self._interpz3d_func = interpz3d_n
         else:
             raise ValueError(f"Unavailable `level` type : {type(level)}")
             
-        # convert to fortran type and shape from `zyx` to `xyz`
-        self._zdata_f = np.asfortranarray(zdata.T)
+        # find level index and weight
+        zdata_f = np.asfortranarray(zdata.T)
+        lev_idx = find_level_func(zdata_f, level)    # (nx, ny, nlev)
+        weight = find_weight_func(zdata_f, level, lev_idx)    # (nx, ny, nlev)
         
-        # find level index, shape = (nx, ny, nlev)
-        self._lev_idx = find_level_func(self._zdata_f, level)
+        self._zdata_f = zdata_f
+        self._lev_idx = lev_idx
+        self._weight = weight
     
     def interp(self, *var):
         """
@@ -360,16 +365,16 @@ class Interpz3d:
         If len(var) > 1, it would return a list which elements are interpolated variable and
         shape = (nlev, ny, nx).
         """
+        nz = self.zdata.shape[0]
         lev_idx = self._lev_idx
-        zdata_f = self._zdata_f
+        weight = self._weight
+        
         interpz3d_func = self._interpz3d_func
-        level = self.level
         missing_value = self.missing_value
-        nz = zdata_f.shape[-1]
         
         if len(var) == 1:
             v_f = np.asfortranarray(var[0].T)
-            v_interp = interpz3d_func(v_f, zdata_f, level, lev_idx)   # (nx, ny)
+            v_interp = interpz3d_func(v_f, lev_idx, weight)   # (nx, ny)
             v_interp[lev_idx == 0] = np.nan
             v_interp[lev_idx == nz] = np.nan
             return v_interp.T
@@ -379,7 +384,7 @@ class Interpz3d:
         
             for v in var:
                 v_f = np.asfortranarray(v.T)
-                v_interp = interpz3d_func(v_f, zdata_f, level, lev_idx)   # (nx, ny, nlev)
+                v_interp = interpz3d_func(v_f, lev_idx, weight)   # (nx, ny, nlev)
                 v_interp[lev_idx == 0] = missing_value
                 v_interp[lev_idx == nz] = missing_value
                 var_interp.append(v_interp.T)
