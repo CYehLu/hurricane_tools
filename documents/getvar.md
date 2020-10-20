@@ -14,6 +14,7 @@ class <span style="color:#a77864">**GetVar**</span>
 | :------ | :---------- |
 | <font color="#a77864"> **\_\_init\_\_** </font> | Initialization the instance. |
 | <font color="#a77864"> **close** </font> | Close attribute of GetVar instance. |
+| <font color="#a77864"> **get\_times** </font> | Get `Times` variable from netCDF file. |
 | <font color="#a77864"> **get** </font> | Get variable by its name. |
 
 
@@ -40,6 +41,23 @@ class <span style="color:#a77864">**GetVar**</span>
             Close GetVar.ncfile or not. Default is True.
         variables : optional, bool
             Delete GetVar.variables or not. Default is False.
+
+  
+<span style="color:#cca99b">GetVar</span>.<span style="color:#a77864">**get\_times**</span>**(self, dt=None)**
+
+        Get `Times` variable from netCDF file.
+        
+        Directly get `Times` from netCDF file would return a (ntime, 19) array, each column
+        of array is a `numpy.bytes_` and it is not easy to read.
+        This method would transform this np.bytes_ array, and return a list of string (or 
+        datetime object, pandas DatetimeIndex) which is more convenient to read.
+        
+        Paramter
+        --------
+        dt : str, 'python' or 'pandas'. optional
+            Default is None, it would return a list of string.
+            If 'python', it would return a list of datetime object.
+            If 'pandas', it would return a pandas.DatatimeIndex
 
   
 <span style="color:#cca99b">GetVar</span>.<span style="color:#a77864">**get**</span>**(self, var_name, squeeze=True, filled=True)**

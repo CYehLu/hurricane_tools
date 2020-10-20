@@ -1,4 +1,6 @@
+import datetime
 import numpy as np
+import pandas as pd
 import wrf
 from netCDF4 import Dataset, MFDataset
 
@@ -217,7 +219,41 @@ class GetVar:
         pvo_f = func_pvo(u_f, v_f, theta_f, pres_f, msfu_f, msfv_f, msfm_f, f_f, dx, dy)
         pvo = np.asanyarray(pvo_f.T, order='C')
         return pvo
+    
+    def get_times(self, dt=None):
+        """
+        Get `Times` variable from netCDF file.
+        
+        Directly get `Times` from netCDF file would return a (ntime, 19) array, each column
+        of array is a `numpy.bytes_` and it is not easy to read.
+        This method would transform this np.bytes_ array, and return a list of string (or 
+        datetime object, pandas DatetimeIndex) which is more convenient to read.
+        
+        Paramter
+        --------
+        dt : str, 'python' or 'pandas'. optional
+            Default is None, it would return a list of string.
+            If 'python', it would return a list of datetime object.
+            If 'pandas', it would return a pandas.DatatimeIndex
+        """
+        times = self.get('Times')
+        
+        res = []
+        for tt in times:
+            res.append(''.join(list(map(lambda b: b.decode('utf-8'), tt))))
 
+        if dt is None:
+            return res
+
+        elif dt == 'python':
+            return list(map(lambda s: datetime.datetime.strptime(s, '%Y-%m-%d_%H:%M:%S'), res))
+
+        elif dt == 'pandas':
+            return pd.to_datetime(res, format='%Y-%m-%d_%H:%M:%S')
+
+        else:
+            raise ValueError(f"Argument `dt` should be None, 'python', or 'pandas'. Not `{dt}`.")
+        
     def get(self, var_name, squeeze=True, filled=True):
         """
         Get variable by its name.
