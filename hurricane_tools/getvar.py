@@ -1,9 +1,9 @@
 import datetime
 import numpy as np
 import pandas as pd
-import wrf
 from netCDF4 import Dataset, MFDataset
 
+from .destag import destagger
 from .fortran.f90tk import calc_tk, calc_tk_nd
 from .fortran.f90slp import dcomputeseaprs, dcomputeseaprs_nt
 from .fortran.f90dbz import calcdbz, calcdbz_nt
@@ -113,7 +113,7 @@ class GetVar:
         #ph = (ph + phb) / 9.81
         np.add(ph, phb, out=ph)
         np.divide(ph, 9.81, out=ph)
-        ph = wrf.destagger(ph, -3)
+        ph = destagger(ph, -3)
 
         # convert to fortran type, shape from (nt, nz, ny, nx) to (nx, ny, nz)
         ph = np.asfortranarray(np.squeeze(ph).T)
