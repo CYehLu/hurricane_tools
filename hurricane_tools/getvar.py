@@ -134,6 +134,9 @@ class GetVar:
     def _geopt(self):
         return self.get('PH') + self.get('PHB')
     
+    def _theta(self):
+        return self.get('T') + 300
+    
     def _dbz(self, func_dbz, use_varint=False, use_liqskin=False):
         # get necessary variables
         pres = np.squeeze(self.get('pres')) * 100   # hPa to Pa
@@ -268,6 +271,7 @@ class GetVar:
                 'tk'    --  Temperature (unit: K)
                 'pres'  --  Pressure (unit: hPa)
                 'geopt' --  Geopotential (unit: m2 s-2)
+                'theta' --  (Full) Potential Temperature (unit: K)
                 'dbz'   --  Radar Reflectivity 
                 'avo'   --  Absolute Vorticity (unit: 10-5 s-1)
                 'pvo'   --  Potential Vorticity (unit: PVU)
@@ -299,7 +303,7 @@ class GetVar:
                 var = self.ncfile.variables[var_name][self.timeidx]
                 
             else:
-                # calculate diagnois variable from fortran
+                # calculate diagnosis variable
                 if var_name == 'slp':
                     var = self._slp(self._func['slp'])
                 elif var_name == 'tk':
@@ -308,6 +312,8 @@ class GetVar:
                     var = self._pres()
                 elif var_name == 'geopt':
                     var = self._geopt()
+                elif var_name == 'theta':
+                    var = self._theta()
                 elif var_name == 'dbz':
                     var = self._dbz(self._func['dbz'])
                 elif var_name == 'avo':

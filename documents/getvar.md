@@ -74,6 +74,7 @@ class <span style="color:#a77864">**GetVar**</span>
                 'tk'    --  Temperature (unit: K)
                 'pres'  --  Pressure (unit: hPa)
                 'geopt' --  Geopotential (unit: m2 s-2)
+                'theta' --  (Full) Potential Temperature (unit: K)
                 'dbz'   --  Radar Reflectivity 
                 'avo'   --  Absolute Vorticity (unit: 10-5 s-1)
                 'pvo'   --  Potential Vorticity (unit: PVU)
