@@ -1,4 +1,5 @@
 import os
+import re
 
 
 def parse_one_line_doc(i, content):
@@ -206,7 +207,8 @@ def parse_cls(i, content):
 
 
 def parse_module(file_path):
-    module_name = file_path.split('/')[-1].rstrip('.py')
+    # e.g. file_path = './hurricane_tools/test.py'  ->  'test'
+    module_name = re.findall('([a-zA-Z0-9_]+).py', file_path)[0]
     module_dict = {}   # key is function/class name, value is some informations
     
     ### e.g
@@ -454,7 +456,8 @@ def gen_readme_document(root_path, include=None, ignore=None):
     for ff in pls:
         # ff: files and folders
         if os.path.isdir(ff):
-            parse_package('./')   # Unfinished!!!!
+            #parse_package(ff)   # Unfinished!!!!
+            pass
         else:
             module_name, module_dict = parse_module(ff)
             readme.update_content(module_name, module_dict)

@@ -1,6 +1,6 @@
-# temporar  
+# temporary  
 
-[[source](.././hurricane_tools//temporar.py)]  
+[[source](.././hurricane_tools//temporary.py)]  
 
 class <span style="color:#a77864">**TemporaryObj**</span>
 

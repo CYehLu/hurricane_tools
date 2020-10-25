@@ -117,9 +117,9 @@ parse_wrf_center_mesg
 
 
 ******
-temporar
+temporary
 ------
-[document](./documents/temporar.md) 
+[document](./documents/temporary.md) 
 
 | Function / Class | Description |
 | :--------------- | :---------- |
