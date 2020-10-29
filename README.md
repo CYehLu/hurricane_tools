@@ -117,6 +117,17 @@ parse_wrf_center_mesg
 
 
 ******
+plot
+------
+[document](./documents/plot.md) 
+
+| Function / Class | Description |
+| :--------------- | :---------- |
+| <font color="#a77864"> **CWBcmapDBZ** </font> | Colormap, colors, contour levels and norm of CWB dbz pictures. |
+| <font color="#a77864"> **CWBcmapRain** </font> | Colormap, colors, contour levels and norm of CWB accumulated daily/hourly rainfall pictures. |
+
+
+******
 temporary
 ------
 [document](./documents/temporary.md) 
