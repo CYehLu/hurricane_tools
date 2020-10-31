@@ -38,6 +38,17 @@ class CWBcmapDBZ:
         Contour levels
     norm : matplotlib.colors.BoundaryNorm
         Can be used in `plt.contourf`
+    kwargs : Dict
+        kwargs = {'norm': ..., 'cmap': ..., 'levels': ...}
+        Using `**CWBcmapDBZ.kwargs` in `contourf`
+            >>> plt.contourf(dbz, **CWBcmapDBZ.kwargs)
+        is equivalent to 
+            >>> plt.contourf(
+            ...     dbz, 
+            ...     levels=CWBcmapDBZ.levels
+            ...     cmap=CWBcmapDBZ.cmap,
+            ...     norm=CWBcmapDBZ.norm
+            ... )
     """
     
     _colors_blue = [
@@ -125,6 +136,7 @@ class CWBcmapDBZ:
     cmap = matplotlib.colors.ListedColormap(colors)
     levels = np.arange(0, 66+1, 1)
     norm = matplotlib.colors.BoundaryNorm(levels, len(colors))
+    kwargs = {'norm': norm, 'levels': levels, 'cmap': cmap}
     
     def __init__(self, n=None):
         """
@@ -149,6 +161,7 @@ class CWBcmapDBZ:
         self.cmap = matplotlib.colors.ListedColormap(self.colors)
         self.levels = np.arange(0, 66+1, n)
         self.norm = matplotlib.colors.BoundaryNorm(self.levels, len(self.colors))
+        self.kwargs = {'norm': self.norm, 'levels': self.levels, 'cmap': self.cmap}
 
 
 class CWBcmapRain:
@@ -198,6 +211,17 @@ class CWBcmapRain:
         For small interval (daily), max of levels is 400. And 1900 for large interval.
     norm : matplotlib.colors.BoundaryNorm
         Can be used in `plt.contourf`
+    kwargs : Dict
+        kwargs = {'norm': ..., 'cmap': ..., 'levels': ...}
+        Using `**CWBcmapRain.kwargs` in `contourf`
+            >>> plt.contourf(rain, **CWBcmapRain.kwargs)
+        is equivalent to 
+            >>> plt.contourf(
+            ...     rain, 
+            ...     levels=CWBcmapRain.levels
+            ...     cmap=CWBcmapRain.cmap,
+            ...     norm=CWBcmapRain.norm
+            ... )
     """
     
     colors = [
@@ -222,6 +246,7 @@ class CWBcmapRain:
     cmap = matplotlib.colors.ListedColormap(colors)
     levels = np.array([0, 1, 2, 6, 10, 15, 20, 30, 40, 50, 70, 90, 110, 130, 150, 200, 300, 400])
     norm = matplotlib.colors.BoundaryNorm(levels, len(colors))
+    kwargs = {'norm': norm, 'levels': levels, 'cmap': cmap}
     
     def __init__(self, interval=None, timeunit=None):
         """
@@ -252,3 +277,4 @@ class CWBcmapRain:
             
         self.levels = levels
         self.norm = matplotlib.colors.BoundaryNorm(self.levels, len(self.colors))
+        self.kwargs = {'norm': self.norm, 'levels': self.levels, 'cmap': self.cmap}

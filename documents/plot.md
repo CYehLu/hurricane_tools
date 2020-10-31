@@ -38,6 +38,17 @@ class <span style="color:#a77864">**CWBcmapDBZ**</span>
         Contour levels
     norm : matplotlib.colors.BoundaryNorm
         Can be used in `plt.contourf`
+    kwargs : Dict
+        kwargs = {'norm': ..., 'cmap': ..., 'levels': ...}
+        Using `**CWBcmapDBZ.kwargs` in `contourf`
+            >>> plt.contourf(dbz, **CWBcmapDBZ.kwargs)
+        is equivalent to 
+            >>> plt.contourf(
+            ...     dbz, 
+            ...     levels=CWBcmapDBZ.levels
+            ...     cmap=CWBcmapDBZ.cmap,
+            ...     norm=CWBcmapDBZ.norm
+            ... )
 
 
 
@@ -105,6 +116,17 @@ class <span style="color:#a77864">**CWBcmapRain**</span>
         For small interval (daily), max of levels is 400. And 1900 for large interval.
     norm : matplotlib.colors.BoundaryNorm
         Can be used in `plt.contourf`
+    kwargs : Dict
+        kwargs = {'norm': ..., 'cmap': ..., 'levels': ...}
+        Using `**CWBcmapRain.kwargs` in `contourf`
+            >>> plt.contourf(rain, **CWBcmapRain.kwargs)
+        is equivalent to 
+            >>> plt.contourf(
+            ...     rain, 
+            ...     levels=CWBcmapRain.levels
+            ...     cmap=CWBcmapRain.cmap,
+            ...     norm=CWBcmapRain.norm
+            ... )
 
 
 
