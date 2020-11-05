@@ -2,6 +2,12 @@ import numpy as np
 import matplotlib
 
 
+__all__ = [
+    'CWBcmapDBZ',
+    'CWBcmapRain'
+]
+
+
 class CWBcmapDBZ:
     """
     Colormap, colors, contour levels and norm of CWB dbz pictures.
@@ -244,7 +250,7 @@ class CWBcmapRain:
         '#FFD6FE'
     ]
     cmap = matplotlib.colors.ListedColormap(colors)
-    levels = np.array([0, 1, 2, 6, 10, 15, 20, 30, 40, 50, 70, 90, 110, 130, 150, 200, 300, 400])
+    levels = np.array([0.5, 1, 2, 6, 10, 15, 20, 30, 40, 50, 70, 90, 110, 130, 150, 200, 300, 400])
     norm = matplotlib.colors.BoundaryNorm(levels, len(colors))
     kwargs = {'norm': norm, 'levels': levels, 'cmap': cmap}
     
@@ -267,13 +273,13 @@ class CWBcmapRain:
             timeunit = 'daily'
         
         if interval == 'small' and timeunit == 'daily':
-            levels = np.array([0, 1, 2, 6, 10, 15, 20, 30, 40, 50, 70, 90, 110, 130, 150, 200, 300, 400])
+            levels = np.array([0.5, 1, 2, 6, 10, 15, 20, 30, 40, 50, 70, 90, 110, 130, 150, 200, 300, 400])
         elif interval == 'large' and timeunit == 'daily':
-            levels = np.array([0, 10, 20, 60, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1500, 1900])
+            levels = np.array([0.5, 10, 20, 60, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1500, 1900])
         elif interval == 'small' and timeunit == 'hourly':
-            levels = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17])
+            levels = np.array([0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17])
         elif interval == 'large' and timeunit == 'hourly':
-            levels = np.array([0, 1, 2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75])
+            levels = np.array([0.5, 1, 2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75])
             
         self.levels = levels
         self.norm = matplotlib.colors.BoundaryNorm(self.levels, len(self.colors))

@@ -2,6 +2,11 @@ import numpy as np
 from scipy.spatial import qhull
 
 
+__all__ = [
+    'FastGridata'
+]
+
+
 class FastGriddata:
     """
     Faster version of scipy.interpolate.griddata (in repeatly interpolating 

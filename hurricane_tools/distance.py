@@ -2,6 +2,12 @@ import numpy as np
 from scipy.optimize import root
 
 
+__all__ = [
+    'latlon2distance',
+    'find_lonlat_with_distance'
+]
+
+
 def latlon2distance(lon1, lat1, lon2, lat2):
     """calculate the distance (km) of two positions"""
     # approximate radius of earth in km

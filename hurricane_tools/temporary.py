@@ -1,3 +1,8 @@
+__all__ = [
+    'TemporaryObj'
+]
+
+
 class TemporaryObj:
     """Using this instance to collecte some temporary variables."""
     

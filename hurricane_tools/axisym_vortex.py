@@ -2,6 +2,13 @@ import numpy as np
 from scipy.optimize import root
 
 
+__all__ = [
+    'rankine_vortex',
+    'holland80',
+    'willoughby04'
+]
+
+
 def rankine_vortex(r, vmax, rmax, alpha=1):
     """
     Classic rankine vortex.

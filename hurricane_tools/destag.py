@@ -1,6 +1,11 @@
 import numpy as np
 
 
+__all__ = [
+    'destagger'
+]
+
+
 def destagger(var, stagger_dim):
     """
     Convert variable from staggered to unstagger grid.
