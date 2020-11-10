@@ -55,6 +55,7 @@ class <span style="color:#a77864">**CWBcmapDBZ**</span>
 | Methods | Description |
 | :------ | :---------- |
 | <font color="#a77864"> **\_\_init\_\_** </font> | Choose coaser levels. |
+| <font color="#a77864"> **show\_cmap** </font> | Show current color map. |
 
 
 <span style="color:#cca99b">CWBcmapDBZ</span>.<span style="color:#a77864">**\_\_init\_\_**</span>**(self, n=None)**
@@ -66,6 +67,19 @@ class <span style="color:#a77864">**CWBcmapDBZ**</span>
         n : int, n >= 1.
             Use coaser `n` times levels.
             Default is 1 (identical to original one).
+
+  
+<span style="color:#cca99b">CWBcmapDBZ</span>.<span style="color:#a77864">**show\_cmap**</span>**(self, tickintv=1)**
+
+        Show current color map.
+        
+        The xticks of plotting are `self.levels`. When `self.levels` contains non-integer,
+        only one decimal place will be displayed.
+        
+        Parameter
+        ---------
+        tickitnv : int, optional
+            The xtick interval of plotting. Default is 1.
 
   
 ******
@@ -133,6 +147,8 @@ class <span style="color:#a77864">**CWBcmapRain**</span>
 | Methods | Description |
 | :------ | :---------- |
 | <font color="#a77864"> **\_\_init\_\_** </font> | Choose small or large interval, daily or hourly levels. |
+| <font color="#a77864"> **set\_levels** </font> | Set new levels. `norm` and `kwargs` will also change. |
+| <font color="#a77864"> **show\_cmap** </font> | Show current color map. |
 
 
 <span style="color:#cca99b">CWBcmapRain</span>.<span style="color:#a77864">**\_\_init\_\_**</span>**(self, interval=None, timeunit=None)**
@@ -147,6 +163,26 @@ class <span style="color:#a77864">**CWBcmapRain**</span>
         timeunit : {'daily', 'hourly'}
             Using daily or hourly accumulated rainfall levels.
             Default is 'daily'.
+
+  
+<span style="color:#cca99b">CWBcmapRain</span>.<span style="color:#a77864">**set\_levels**</span>**(self, levels)**
+
+        Set new levels. `norm` and `kwargs` will also change.
+        
+        Note : levels.size should equal to 18, because len(self.colors) = 17.
+
+  
+<span style="color:#cca99b">CWBcmapRain</span>.<span style="color:#a77864">**show\_cmap**</span>**(self, tickintv=1)**
+
+        Show current color map.
+        
+        The xticks of plotting are `self.levels`. When `self.levels` contains non-integer,
+        only one decimal place will be displayed.
+        
+        Parameter
+        ---------
+        tickitnv : int, optional
+            The xtick interval of plotting. Default is 1.
 
   
 ******

@@ -1,5 +1,8 @@
+from types import MethodType
+
 import numpy as np
 import matplotlib
+import matplotlib.pyplot as plt
 
 
 __all__ = [
@@ -7,6 +10,24 @@ __all__ = [
     'CWBcmapRain'
 ]
 
+
+class _HybridMethod:
+    """
+    Make method can be called by instance or class.
+    Used in `CWBcmapDBZ.show_cmap()` and `CWBcmapRain.show_cmap()`
+    
+    Reference : https://reurl.cc/d5l6Ag
+    juanpa.arrivillaga's answer
+    """
+    def __init__(self, f):
+        self.f = f
+
+    def __get__(self, obj, cls=None):
+        if obj is None:
+            return MethodType(self.f, cls)
+        else:
+            return MethodType(self.f, obj)
+        
 
 class CWBcmapDBZ:
     """
@@ -168,6 +189,31 @@ class CWBcmapDBZ:
         self.levels = np.arange(0, 66+1, n)
         self.norm = matplotlib.colors.BoundaryNorm(self.levels, len(self.colors))
         self.kwargs = {'norm': self.norm, 'levels': self.levels, 'cmap': self.cmap}
+        
+    @_HybridMethod
+    def show_cmap(self, tickintv=1):
+        """
+        Show current color map.
+        
+        The xticks of plotting are `self.levels`. When `self.levels` contains non-integer,
+        only one decimal place will be displayed.
+        
+        Parameter
+        ---------
+        tickitnv : int, optional
+            The xtick interval of plotting. Default is 1.
+        """       
+        levels = self.levels
+        cmap = self.cmap
+        
+        plt.figure(figsize=(8, 24))
+        plt.imshow([np.arange(len(levels)-1)], cmap=cmap)
+
+        xticks = np.arange(-0.5, len(levels)-0.5, 1)
+        xticklabels = [f'{int(lev):d}' if int(lev) == lev else f'{lev:.1f}' for lev in levels]
+        plt.xticks(xticks[::tickintv], xticklabels[::tickintv])
+        plt.yticks([], [])
+        plt.show()
 
 
 class CWBcmapRain:
@@ -284,3 +330,38 @@ class CWBcmapRain:
         self.levels = levels
         self.norm = matplotlib.colors.BoundaryNorm(self.levels, len(self.colors))
         self.kwargs = {'norm': self.norm, 'levels': self.levels, 'cmap': self.cmap}
+        
+    def set_levels(self, levels):
+        """
+        Set new levels. `norm` and `kwargs` will also change.
+        
+        Note : levels.size should equal to 18, because len(self.colors) = 17.
+        """
+        self.levels = levels
+        self.norm = matplotlib.colors.BoundaryNorm(self.levels, len(self.colors))
+        self.kwargs = {'norm': self.norm, 'levels': self.levels, 'cmap': self.cmap}
+        
+    @_HybridMethod
+    def show_cmap(self, tickintv=1):
+        """
+        Show current color map.
+        
+        The xticks of plotting are `self.levels`. When `self.levels` contains non-integer,
+        only one decimal place will be displayed.
+        
+        Parameter
+        ---------
+        tickitnv : int, optional
+            The xtick interval of plotting. Default is 1.
+        """       
+        levels = self.levels
+        cmap = self.cmap
+        
+        plt.figure(figsize=(8, 24))
+        plt.imshow([np.arange(len(levels)-1)], cmap=cmap)
+
+        xticks = np.arange(-0.5, len(levels)-0.5, 1)
+        xticklabels = [f'{int(lev):d}' if int(lev) == lev else f'{lev:.1f}' for lev in levels]
+        plt.xticks(xticks[::tickintv], xticklabels[::tickintv])
+        plt.yticks([], [])
+        plt.show()
