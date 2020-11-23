@@ -37,22 +37,12 @@ class CWBcmapDBZ:
     -------
     >>> dbz = _generate_fake_data()
     >>> # 1. default setting
-    >>> plt.contourf(
-    ...     dbz, 
-    ...     norm=CWBcmapDBZ.norm, 
-    ...     levels=CWBcmapDBZ.levels, 
-    ...     cmap=CWBcmapDBZ.cmap
-    ... )
+    >>> plt.contourf(dbz, **CWBcmapDBZ.kwargs)
     >>> plt.show()
     >>> 
-    >>> # 2. more coarse color levels
+    >>> # 2. coarser color levels
     >>> cwbdbz = CWBcmapDBZ(n=4)    # 4 times coarser
-    >>> plt.contourf(
-    ...     dbz, 
-    ...     norm=cwbdbz.norm, 
-    ...     levels=cwbdbz.levels, 
-    ...     cmap=cwbdbz.cmap
-    ... )
+    >>> plt.contourf(dbz, **cwbdbz.kwargs)
     >>> plt.show()
     
     Attributes 
@@ -191,29 +181,51 @@ class CWBcmapDBZ:
         self.kwargs = {'norm': self.norm, 'levels': self.levels, 'cmap': self.cmap}
         
     @_HybridMethod
-    def show_cmap(self, tickintv=1):
+    def show_colorbar(self, tickintv=None, ticks=None, figsize=None):
         """
-        Show current color map.
+        Show current colorbar.
         
-        The xticks of plotting are `self.levels`. When `self.levels` contains non-integer,
+        The ticks of colorbar are `self.levels`. When `self.levels` contains non-integer,
         only one decimal place will be displayed.
         
         Parameter
         ---------
-        tickitnv : int, optional
-            The xtick interval of plotting. Default is 1.
+        tickintv : int, optional
+            The ticks interval of plotting. Default is 1.
+        ticks : array-like, optional
+            The ticks of colorbar. 
+            `tickintv` has priority over `ticks` when both of them are given.
+        figsize : Tuple(int, int). optional
+            Figure size. Default is (10, 1).
+            
+        Return
+        ------
+        Instance of `matplotlib.colorbar.ColorbarBase`
         """       
-        levels = self.levels
-        cmap = self.cmap
+        if tickintv is None and ticks is None:
+            cb_ticks = self.levels
+        elif tickintv is not None:
+            cb_ticks = self.levels[::tickintv]
+        elif ticks is not None:
+            cb_ticks = ticks
+            
+        if figsize is None:
+            figsize = (10, 1)
+            
         
-        plt.figure(figsize=(8, 24))
-        plt.imshow([np.arange(len(levels)-1)], cmap=cmap)
+        fig, ax = plt.subplots(figsize=figsize)
+        fig.subplots_adjust(bottom=0.5)
 
-        xticks = np.arange(-0.5, len(levels)-0.5, 1)
-        xticklabels = [f'{int(lev):d}' if int(lev) == lev else f'{lev:.1f}' for lev in levels]
-        plt.xticks(xticks[::tickintv], xticklabels[::tickintv])
-        plt.yticks([], [])
-        plt.show()
+        cb = matplotlib.colorbar.ColorbarBase(
+            ax, 
+            cmap=self.cmap,
+            norm=self.norm,
+            orientation='horizontal'
+        )
+        cb.set_ticks(cb_ticks)
+        cb.set_label('CWB dBZ')
+        
+        return cb
 
 
 class CWBcmapRain:
@@ -234,22 +246,12 @@ class CWBcmapRain:
     -------
     >>> rain = _generate_fake_data()
     >>> # 1. default setting
-    >>> plt.contourf(
-    ...     rain, 
-    ...     norm=CWBcmapRain.norm, 
-    ...     levels=CWBcmapRain.levels, 
-    ...     cmap=CWBcmapRain.cmap
-    ... )
+    >>> plt.contourf(rain, **CWBcmapRain.kwargs)
     >>> plt.show()
     >>> 
     >>> # 2. choose large interval and hourly time unit
     >>> cwbrain = CWBcmapRain(interval='large', timeunit='hourly')
-    >>> plt.contourf(
-    ...     rain, 
-    ...     norm=cwbrain.norm, 
-    ...     levels=cwbrain.levels, 
-    ...     cmap=cwbrain.cmap
-    ... )
+    >>> plt.contourf(rain, **cwbrain.kwargs)
     >>> plt.show()
     
     Attributes 
@@ -342,26 +344,48 @@ class CWBcmapRain:
         self.kwargs = {'norm': self.norm, 'levels': self.levels, 'cmap': self.cmap}
         
     @_HybridMethod
-    def show_cmap(self, tickintv=1):
+    def show_colorbar(self, tickintv=None, ticks=None, figsize=None):
         """
-        Show current color map.
+        Show current colorbar.
         
-        The xticks of plotting are `self.levels`. When `self.levels` contains non-integer,
+        The ticks of colorbar are `self.levels`. When `self.levels` contains non-integer,
         only one decimal place will be displayed.
         
         Parameter
         ---------
-        tickitnv : int, optional
-            The xtick interval of plotting. Default is 1.
+        tickintv : int, optional
+            The ticks interval of plotting. Default is 1.
+        ticks : array-like, optional
+            The ticks of colorbar. 
+            `tickintv` has priority over `ticks` when both of them are given.
+        figsize : Tuple(int, int). optional
+            Figure size. Default is (10, 1).
+            
+        Return
+        ------
+        Instance of `matplotlib.colorbar.ColorbarBase`
         """       
-        levels = self.levels
-        cmap = self.cmap
+        if tickintv is None and ticks is None:
+            cb_ticks = self.levels
+        elif tickintv is not None:
+            cb_ticks = self.levels[::tickintv]
+        elif ticks is not None:
+            cb_ticks = ticks
+            
+        if figsize is None:
+            figsize = (10, 1)
+            
         
-        plt.figure(figsize=(8, 24))
-        plt.imshow([np.arange(len(levels)-1)], cmap=cmap)
+        fig, ax = plt.subplots(figsize=figsize)
+        fig.subplots_adjust(bottom=0.5)
 
-        xticks = np.arange(-0.5, len(levels)-0.5, 1)
-        xticklabels = [f'{int(lev):d}' if int(lev) == lev else f'{lev:.1f}' for lev in levels]
-        plt.xticks(xticks[::tickintv], xticklabels[::tickintv])
-        plt.yticks([], [])
-        plt.show()
+        cb = matplotlib.colorbar.ColorbarBase(
+            ax, 
+            cmap=self.cmap,
+            norm=self.norm,
+            orientation='horizontal'
+        )
+        cb.set_ticks(cb_ticks)
+        cb.set_label('CWB Rain')
+        
+        return cb

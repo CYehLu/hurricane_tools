@@ -10,22 +10,12 @@ class <span style="color:#a77864">**CWBcmapDBZ**</span>
     -------
     >>> dbz = _generate_fake_data()
     >>> # 1. default setting
-    >>> plt.contourf(
-    ...     dbz, 
-    ...     norm=CWBcmapDBZ.norm, 
-    ...     levels=CWBcmapDBZ.levels, 
-    ...     cmap=CWBcmapDBZ.cmap
-    ... )
+    >>> plt.contourf(dbz, **CWBcmapDBZ.kwargs)
     >>> plt.show()
     >>> 
-    >>> # 2. more coarse color levels
+    >>> # 2. coarser color levels
     >>> cwbdbz = CWBcmapDBZ(n=4)    # 4 times coarser
-    >>> plt.contourf(
-    ...     dbz, 
-    ...     norm=cwbdbz.norm, 
-    ...     levels=cwbdbz.levels, 
-    ...     cmap=cwbdbz.cmap
-    ... )
+    >>> plt.contourf(dbz, **cwbdbz.kwargs)
     >>> plt.show()
     
     Attributes 
@@ -55,7 +45,7 @@ class <span style="color:#a77864">**CWBcmapDBZ**</span>
 | Methods | Description |
 | :------ | :---------- |
 | <font color="#a77864"> **\_\_init\_\_** </font> | Choose coaser levels. |
-| <font color="#a77864"> **show\_cmap** </font> | Show current color map. |
+| <font color="#a77864"> **show\_colorbar** </font> | Show current colorbar. |
 
 
 <span style="color:#cca99b">CWBcmapDBZ</span>.<span style="color:#a77864">**\_\_init\_\_**</span>**(self, n=None)**
@@ -69,17 +59,26 @@ class <span style="color:#a77864">**CWBcmapDBZ**</span>
             Default is 1 (identical to original one).
 
   
-<span style="color:#cca99b">CWBcmapDBZ</span>.<span style="color:#a77864">**show\_cmap**</span>**(self, tickintv=1)**
+<span style="color:#cca99b">CWBcmapDBZ</span>.<span style="color:#a77864">**show\_colorbar**</span>**(self, tickintv=None, ticks=None, figsize=None)**
 
-        Show current color map.
+        Show current colorbar.
         
-        The xticks of plotting are `self.levels`. When `self.levels` contains non-integer,
+        The ticks of colorbar are `self.levels`. When `self.levels` contains non-integer,
         only one decimal place will be displayed.
         
         Parameter
         ---------
-        tickitnv : int, optional
-            The xtick interval of plotting. Default is 1.
+        tickintv : int, optional
+            The ticks interval of plotting. Default is 1.
+        ticks : array-like, optional
+            The ticks of colorbar. 
+            `tickintv` has priority over `ticks` when both of them are given.
+        figsize : Tuple(int, int). optional
+            Figure size. Default is (10, 1).
+            
+        Return
+        ------
+        Instance of `matplotlib.colorbar.ColorbarBase`
 
   
 ******
@@ -101,22 +100,12 @@ class <span style="color:#a77864">**CWBcmapRain**</span>
     -------
     >>> rain = _generate_fake_data()
     >>> # 1. default setting
-    >>> plt.contourf(
-    ...     rain, 
-    ...     norm=CWBcmapRain.norm, 
-    ...     levels=CWBcmapRain.levels, 
-    ...     cmap=CWBcmapRain.cmap
-    ... )
+    >>> plt.contourf(rain, **CWBcmapRain.kwargs)
     >>> plt.show()
     >>> 
     >>> # 2. choose large interval and hourly time unit
     >>> cwbrain = CWBcmapRain(interval='large', timeunit='hourly')
-    >>> plt.contourf(
-    ...     rain, 
-    ...     norm=cwbrain.norm, 
-    ...     levels=cwbrain.levels, 
-    ...     cmap=cwbrain.cmap
-    ... )
+    >>> plt.contourf(rain, **cwbrain.kwargs)
     >>> plt.show()
     
     Attributes 
@@ -148,7 +137,7 @@ class <span style="color:#a77864">**CWBcmapRain**</span>
 | :------ | :---------- |
 | <font color="#a77864"> **\_\_init\_\_** </font> | Choose small or large interval, daily or hourly levels. |
 | <font color="#a77864"> **set\_levels** </font> | Set new levels. `norm` and `kwargs` will also change. |
-| <font color="#a77864"> **show\_cmap** </font> | Show current color map. |
+| <font color="#a77864"> **show\_colorbar** </font> | Show current colorbar. |
 
 
 <span style="color:#cca99b">CWBcmapRain</span>.<span style="color:#a77864">**\_\_init\_\_**</span>**(self, interval=None, timeunit=None)**
@@ -172,17 +161,26 @@ class <span style="color:#a77864">**CWBcmapRain**</span>
         Note : levels.size should equal to 18, because len(self.colors) = 17.
 
   
-<span style="color:#cca99b">CWBcmapRain</span>.<span style="color:#a77864">**show\_cmap**</span>**(self, tickintv=1)**
+<span style="color:#cca99b">CWBcmapRain</span>.<span style="color:#a77864">**show\_colorbar**</span>**(self, tickintv=None, ticks=None, figsize=None)**
 
-        Show current color map.
+        Show current colorbar.
         
-        The xticks of plotting are `self.levels`. When `self.levels` contains non-integer,
+        The ticks of colorbar are `self.levels`. When `self.levels` contains non-integer,
         only one decimal place will be displayed.
         
         Parameter
         ---------
-        tickitnv : int, optional
-            The xtick interval of plotting. Default is 1.
+        tickintv : int, optional
+            The ticks interval of plotting. Default is 1.
+        ticks : array-like, optional
+            The ticks of colorbar. 
+            `tickintv` has priority over `ticks` when both of them are given.
+        figsize : Tuple(int, int). optional
+            Figure size. Default is (10, 1).
+            
+        Return
+        ------
+        Instance of `matplotlib.colorbar.ColorbarBase`
 
   
 ******
