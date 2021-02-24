@@ -1,5 +1,5 @@
 import numpy as np
-from .circular import circular_avg_closure
+from .circular import interp_circle_closure
 
 
 __all__ = [
@@ -8,7 +8,7 @@ __all__ = [
 ]
 
 
-def uv2vrvt_rt(u, v, lon, lat, clon, clat, radius, dxdy=None):
+def uv2vrvt_rt(u, v, lon, lat, clon, clat, radius, thetas=None, dxdy=None):
     """
     Calculate Vr (radial wind) and Vt (tangential wind) on r-theta coordinate (polar coordinate).
     
@@ -22,6 +22,10 @@ def uv2vrvt_rt(u, v, lon, lat, clon, clat, radius, dxdy=None):
         Longtitude and latitude of disk center (location of r = 0).
     radius : 1d array, shape = (nradius)
         Radius of circles.
+    thetas : 1d array, shape = (ntheta)
+        The angles (radians) of each sampled points on the circle.
+        See `hurricane_tools.circular.interp_circle`
+        Default is np.arange(*np.deg2rad([0, 360, 1])), the whole circle.
     dxdy : 2 element tuple, (dx, dy). optional
         Spatial resolution. Default is None, and it would find the dx and dy automatically
         based on `lon` and `lat`.
@@ -35,12 +39,12 @@ def uv2vrvt_rt(u, v, lon, lat, clon, clat, radius, dxdy=None):
         radius = np.array([radius])
     elif isinstance(radius, list):
         radius = np.array(radius)
-    nradius = radius.size
     
-    thetas = np.arange(0, 2*np.pi, 2*np.pi/360)   # (ntheta,)
+    if thetas is None:
+        thetas = np.arange(0, 2*np.pi, 2*np.pi/360)   # (ntheta,)
     
     # interpolate `u` and `v` on the circles
-    cirfunc = circular_avg_closure(lon, lat, clon, clat, radius, dxdy=dxdy)
+    cirfunc = interp_circle_closure(lon, lat, clon, clat, radius, thetas, dxdy=(dx, dy))
     u_interp = cirfunc(u)    # (nradius, ntheta)
     v_interp = cirfunc(v)
     
