@@ -44,7 +44,7 @@ def uv2vrvt_rt(u, v, lon, lat, clon, clat, radius, thetas=None, dxdy=None):
         thetas = np.arange(0, 2*np.pi, 2*np.pi/360)   # (ntheta,)
     
     # interpolate `u` and `v` on the circles
-    cirfunc = interp_circle_closure(lon, lat, clon, clat, radius, thetas, dxdy=(dx, dy))
+    cirfunc = interp_circle_closure(lon, lat, clon, clat, radius, thetas, dxdy)
     u_interp = cirfunc(u)    # (nradius, ntheta)
     v_interp = cirfunc(v)
     
