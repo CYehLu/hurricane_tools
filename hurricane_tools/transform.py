@@ -14,7 +14,7 @@ def uv2vrvt_rt(u, v, lon, lat, clon, clat, radius, thetas=None, dxdy=None):
     
     Parameter:
     ---------
-    u, v : 2d array, shape = (ny, nx)
+    u, v : array, shape = (ny, nx) or (nz, ny, nx)
         x and y component wind.
     lon, lat : 2d array, shape = (ny, nx)
         Longtitude and latitude coordinate of `u` and `v`.
@@ -32,7 +32,7 @@ def uv2vrvt_rt(u, v, lon, lat, clon, clat, radius, thetas=None, dxdy=None):
         
     Return:
     ------
-    vr, vt : 2d array, shape = (nradius, ntheta)
+    vr, vt : array, shape = (nradius, ntheta) or (nz, nradius, ntheta)
         Radial wind and tangential wind on the polar coordinate.
     """
     if isinstance(radius, (int, float)):
@@ -45,9 +45,21 @@ def uv2vrvt_rt(u, v, lon, lat, clon, clat, radius, thetas=None, dxdy=None):
     
     # interpolate `u` and `v` on the circles
     cirfunc = interp_circle_closure(lon, lat, clon, clat, radius, thetas, dxdy)
-    u_interp = cirfunc(u)    # (nradius, ntheta)
-    v_interp = cirfunc(v)
     
+    if u.ndim == 2:
+        u_interp = cirfunc(u)    # (nradius, ntheta)
+        v_interp = cirfunc(v)
+        
+    elif u.ndim == 3:
+        shape = (u.shape[0], radius.size, thetas.size)
+        u_interp = np.empty(shape)
+        v_interp = np.empty(shape)
+        
+        for ilev in range(u.shape[0]):
+            u_interp[ilev] = cirfunc(u[ilev,:,:])
+            v_interp[ilev] = cirfunc(v[ilev,:,:])
+        
+    # calc vr/vt at radius/theta coordinate
     vr = u_interp * np.cos(thetas) + v_interp * np.sin(thetas)
     vt = -u_interp * np.sin(thetas) + v_interp * np.cos(thetas)
     return vr, vt
@@ -59,7 +71,7 @@ def uv2vrvt_xy(u, v, lon, lat, clon, clat):
     
     Parameter:
     ---------
-    u, v : 2d array, shape = (ny, nx)
+    u, v : n-d array, shape = (..., ny, nx)
         x and y component wind.
     lon, lat : 2d array, shape = (ny, nx)
         Longtitude and latitude coordinate of `u` and `v`.
@@ -68,7 +80,7 @@ def uv2vrvt_xy(u, v, lon, lat, clon, clat):
 
     Return:
     ------
-    vr, vt : 2d array, shape = (ny, nx)
+    vr, vt : n-d array, shape = (..., ny, nx)
         Radial wind and tangential wind on the cartesian coordinate.
     """
     theta = np.arctan2(lat-clat, lon-clon)   # (ny, nx)

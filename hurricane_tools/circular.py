@@ -177,7 +177,7 @@ def circular_avg(lon, lat, values, clon, clat, radius, theta=None, dxdy=None):
     radius: scaler or 1-d array-like
         The radius of circles. Unit is km.
     theta: 1-d array
-        The angles (radins) of each sampled points on the circle.
+        The angles (radians) of each sampled points on the circle.
         See `interp_circle`
         Default is np.arange(*np.deg2rad([0, 360, 1])), the whole circle.
     dxdy: 2-elements tuple, (dx, dy). Optional

@@ -11,5 +11,6 @@ from . import fourier
 from . import destag
 from . import plot
 from . import temporary
+from . import specialvar
 from .destag import destagger
 from .temporary import TemporaryObj
