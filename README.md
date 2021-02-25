@@ -145,8 +145,8 @@ specialvar
 
 | Function / Class | Description |
 | :--------------- | :---------- |
-| <font color="#a77864"> **inertial_stability_xy** </font> | Calculate (cyclinic) inertial stability at x-y (longtitude-latitude) coordinate. Inertial stability is defined as I^2 = (f + 2*Vt/r) * (f + 1/r * d(r*Vt)/dr) where `f` is coriolis parameter, `Vt` is tangential wind speed, `r` is radius. |
-| <font color="#a77864"> **inertial_stability_rt** </font> | Calculate (cyclinic) inertial stability at cylindrical (radius-theta) coordinate. Inertial stability is defined as I^2 = (f + 2*Vt/r) * (f + 1/r * d(r*Vt)/dr) where `f` is coriolis parameter, `Vt` is tangential wind speed, `r` is radius. |
+| <font color="#a77864"> **inertial_stability_xy** </font> | Calculate (cyclinic) inertial stability at x-y (longtitude-latitude) coordinate. |
+| <font color="#a77864"> **inertial_stability_rt** </font> | Calculate (cyclinic) inertial stability at cylindrical (radius-theta) coordinate. |
 
 
 ******

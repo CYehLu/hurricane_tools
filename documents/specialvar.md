@@ -2,9 +2,10 @@
 
 [[source](.././hurricane_tools//specialvar.py)]  
 
-<span style="color:#a77864">**inertial_stability_xy**</span>**(u, v, f, lon, lat, clon, clat, radius, thetas, dxdy)**
+<span style="color:#a77864">**inertial_stability_xy**</span>**(u, v, f, lon, lat, clon, clat, radius, thetas=None, dxdy=None)**
 
     Calculate (cyclinic) inertial stability at x-y (longtitude-latitude) coordinate.
+    
     Inertial stability is defined as
         I^2 = (f + 2*Vt/r) * (f + 1/r * d(r*Vt)/dr)
     where `f` is coriolis parameter, `Vt` is tangential wind speed, `r` is radius.
@@ -21,7 +22,7 @@
         TC center coordinate
     radius : 1d array, shape = (nradius,)
         Radial coordinate (used to calculate the radial gradient)
-    thetas : 1d array, shape = (ntheta,)
+    thetas : 1d array, shape = (ntheta,). Optional
         The angles (radians) of each sampled points on the circle.
         See `circular.interp_circle`
         Default is np.arange(*np.deg2rad([0, 360, 1])), the whole circle.
@@ -33,7 +34,8 @@
     Return:
     ------
     I : array, shape = (nz, ny, nx)
-        Inertial stability
+        Inertial stability.
+        The result 
 
 
 
@@ -41,6 +43,7 @@
 <span style="color:#a77864">**inertial_stability_rt**</span>**(vt, f, radius, thetas)**
 
     Calculate (cyclinic) inertial stability at cylindrical (radius-theta) coordinate.
+    
     Inertial stability is defined as
         I^2 = (f + 2*Vt/r) * (f + 1/r * d(r*Vt)/dr)
     where `f` is coriolis parameter, `Vt` is tangential wind speed, `r` is radius.
