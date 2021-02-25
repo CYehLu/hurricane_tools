@@ -128,6 +128,17 @@ plot
 
 
 ******
+pseudo_coord
+------
+[document](./documents/pseudo_coord.md) 
+
+| Function / Class | Description |
+| :--------------- | :---------- |
+| <font color="#a77864"> **lonlat2xy** </font> | Convert to distance-based coordinate. |
+| <font color="#a77864"> **xy2lonlat** </font> | Convert to longtitude-latitude coordinate. |
+
+
+******
 specialvar
 ------
 [document](./documents/specialvar.md) 

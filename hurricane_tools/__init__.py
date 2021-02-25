@@ -12,5 +12,6 @@ from . import destag
 from . import plot
 from . import temporary
 from . import specialvar
+from . import pseudo_coord
 from .destag import destagger
 from .temporary import TemporaryObj

@@ -2,6 +2,7 @@ import numpy as np
 from .distance import latlon2distance
 from .transform import uv2vrvt_rt, uv2vrvt_xy
 from .fourier import interp_xy_closure
+from . import pseudo_coord
 
 
 __all__ = [
@@ -58,12 +59,13 @@ def inertial_stability_xy(u, v, f, lon, lat, clon, clat, radius, thetas, dxdy):
     drvt_dr[:,-1,:] = (rvt[:,-1,:] - rvt[:,-2,:]) / (radius[-1] - radius[-2])
     
     # interpolate to x-y coordinate
-    X = latlon2distance(clon, lat, lon, lat)    # (ny, nx)
-    Y = latlon2distance(lon, clat, lon, lat)
-    X[lon < clon] *= -1
-    Y[lat < clat] *= -1
+    #X = latlon2distance(clon, lat, lon, lat)    # (ny, nx)
+    #Y = latlon2distance(lon, clat, lon, lat)
+    #X[lon < clon] *= -1
+    #Y[lat < clat] *= -1
+    X, Y = pseudo_coord.lonlat2xy(lon, lat, clon, clat)   # (ny, nx)
     
-    res = np.empty((nz, nx, ny))
+    res = np.empty((nz, ny, nx))
     func = interp_xy_closure(radius, thetas, X, Y, center=(0, 0))
     for ilev in range(nz):
         res[ilev,:,:] = func(drvt_dr[ilev,:,:])
