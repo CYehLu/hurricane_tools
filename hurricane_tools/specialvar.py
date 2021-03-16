@@ -11,13 +11,14 @@ __all__ = [
 ]
 
 
-def inertial_stability_xy(u, v, f, lon, lat, clon, clat, radius, thetas=None, dxdy=None):
+def inertial_stability_xy(u, v, f, lon, lat, clon, clat, radius=None, thetas=None, dxdy=None):
     """
     Calculate (cyclinic) inertial stability at x-y (longtitude-latitude) coordinate.
     
     Inertial stability is defined as
         I^2 = (f + 2*Vt/r) * (f + 1/r * d(r*Vt)/dr)
     where `f` is coriolis parameter, `Vt` is tangential wind speed, `r` is radius.
+    The returned variable is sqrt(I^2).
     
     Parameter:
     ---------
@@ -29,7 +30,7 @@ def inertial_stability_xy(u, v, f, lon, lat, clon, clat, radius, thetas=None, dx
         Longtitude and latitude
     clon, clat : scalar
         TC center coordinate
-    radius : 1d array, shape = (nradius,)
+    radius : 1d array, shape = (nradius,). Optional
         Radial coordinate (used to calculate the radial gradient)
     thetas : 1d array, shape = (ntheta,). Optional
         The angles (radians) of each sampled points on the circle.
@@ -44,10 +45,24 @@ def inertial_stability_xy(u, v, f, lon, lat, clon, clat, radius, thetas=None, dx
     ------
     I : array, shape = (nz, ny, nx)
         Inertial stability.
-        The result 
     """
     if thetas is None:
         thetas = np.arange(*np.deg2rad([0, 360, 1]))
+        
+    if radius is None:
+        if dxdy is None:
+            dx = latlon2distance(lon[:,1:], lat[:,1:], lon[:,:-1], lat[:,:-1]).mean()
+            dy = latlon2distance(lon[1:,:], lat[1:,:], lon[:-1,:], lat[:-1,:]).mean()
+            dr = max(dx, dy)
+        else:
+            dr = max(dxdy)
+        
+        n = 5
+        slc = (slice(n, -n), slice(n, -n))
+        dist_x = latlon2distance(clon, lat[slc], lon[slc], lat[slc])
+        dist_y = latlon2distance(lon[slc], clat, lon[slc], lat[slc])
+        maxdist = min(dist_x.max(), dist_y.max())
+        radius = np.arange(0, maxdist, dr)
         
     nz, ny, nx = u.shape
     nradius = radius.size
@@ -64,13 +79,8 @@ def inertial_stability_xy(u, v, f, lon, lat, clon, clat, radius, thetas=None, dx
     drvt_dr[:,-1,:] = (rvt[:,-1,:] - rvt[:,-2,:]) / (radius[-1] - radius[-2])
     
     # interpolate to x-y coordinate
-    #X = latlon2distance(clon, lat, lon, lat)    # (ny, nx)
-    #Y = latlon2distance(lon, clat, lon, lat)
-    #X[lon < clon] *= -1
-    #Y[lat < clat] *= -1
-    X, Y = pseudo_coord.lonlat2xy(lon, lat, clon, clat)   # (ny, nx)
-    
     res = np.empty((nz, ny, nx))
+    X, Y = pseudo_coord.lonlat2xy(lon, lat, clon, clat)   # (ny, nx)
     func = interp_xy_closure(radius, thetas, X, Y, center=(0, 0))
     for ilev in range(nz):
         res[ilev,:,:] = func(drvt_dr[ilev,:,:])

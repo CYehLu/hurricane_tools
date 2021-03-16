@@ -243,7 +243,7 @@ def circular_avg_closure(lon, lat, clon, clat, radius, theta=None, dxdy=None):
     return inner
 
 
-def rmw(lon, lat, ws, clon, clat, maxdist=550, dr=1, box=True, **kwargs):
+def rmw(lon, lat, ws, clon, clat, maxdist=None, dr=None, dxdy=None):
     """
     Find TC RMW
     
@@ -255,57 +255,45 @@ def rmw(lon, lat, ws, clon, clat, maxdist=550, dr=1, box=True, **kwargs):
         Wind speed
     clon, clat : scalar
         TC center longtitude / latitude
-    maxdist : scalar
-        The maximum search distance (km). Default is 550
-    dr : scalar
-        The radius (km) interval. Default is 1
-    box : bool
-        Create a box area that only calculate interpolation in this
-        box. Default is True.
-    **kwargs : 
-        Keyword arguments for `circular_avg`
+    maxdist : scalar. Optional
+        The maximum search distance (km)
+    dr : scalar. Optional
+        The radius (km) interval
+    dxdy : Tuple(dy_scalar, dx_scalar). Optional
+        Spatial resolution.
         
     Return
     ------
-    radius : 1d array, shape = (n,)
-        Radius, the coordinate of `axissym_ws`.
-        The distance between i'th `axissym_ws` profile location
-        and TC center is radius[i].
-    axissym_ws : 1d array, shape = (n,)
-        Axis-symmetric wind speed profile
     rmw : scalar
         Radius of maximum wind speed
     """
-    if box:
-        # find the index where lon[idx1,idx2] / lat[idx1,idx2] are the nearest to clon/clat
-        _, idx2 = np.unravel_index(np.argmin(np.abs((lon - clon))), lon.shape)
-        idx1, _ = np.unravel_index(np.argmin(np.abs((lat - clat))), lat.shape)
-
-        # set a box area, and only calculate curcular average in this box area
-        dlon = lon[0,1] - lon[0,0]
-        dlat = lat[1,0] - lat[0,0]
-        dy = dlat * 110.567
-        L = (maxdist+10) // dy   # the half length of box edge
-
-        bottom = (idx1 - L) if (idx1 - L >= 0) else 0
-        up = (idx1 + L) if (idx1 + L <= lon.shape[0]) else -1
-        left = (idx2 - L) if (idx2 - L >= 0) else 0
-        right = (idx2 + L) if (idx2 + L <= lon.shape[1]) else -1
-        bottom, up, left, right = int(bottom), int(up), int(left), int(right)
-
-        lon_box = lon[bottom:up, left:right]
-        lat_box = lat[bottom:up, left:right]
-        ws_box = ws[bottom:up, left:right]
+    # find appropriate `maxdist`
+    n = 5
+    slc = (slice(n, -n), slice(n, -n))
+    dist_x = latlon2distance(clon, lat[slc], lon[slc], lat[slc])
+    dist_y = latlon2distance(lon[slc], clat, lon[slc], lat[slc])
+    _maxdist = min(dist_x.max(), dist_y.max())
+    
+    if maxdist is None:
+        maxdist = _maxdist
+    elif maxdist > _maxdist:
+        warnings.warn(f"`maxdist` is too large. Replace with {_maxdist:.2f}.")
+        maxdist = _maxdist
+    
+    # find appropriate `dr`
+    if dxdy is None:
+        dx = latlon2distance(lon[:,1:], lat[:,1:], lon[:,:-1], lat[:,:-1]).mean()
+        dy = latlon2distance(lon[1:,:], lat[1:,:], lon[:-1,:], lat[:-1,:]).mean()
     else:
-        lon_box = lon
-        lat_box = lat
-        ws_box = ws
-
-    #radius = np.linspace(0, maxdist, maxdist)
-    radius = np.arange(0, maxdist+dr, dr)
-    axissym_ws = circular_avg(lon_box, lat_box, ws_box, clon, clat, radius)
-    rmw = radius[np.nanargmax(axissym_ws)]
-    return radius, axissym_ws, rmw
+        dx, dy = dxdy
+                        
+    if dr is None: 
+        dr = max(dx, dy)
+        
+    # interpolate
+    radius = np.arange(0, maxdist, dr)
+    axisym_ws = circular_avg(lon, lat, ws, clon, clat, radius, dxdy=(dx, dy))
+    return radius[axisym_ws.argmax()]
 
 
 def axisymmetricity(lon, lat, var, radius, clon, clat, dxdy=None, integ='trapz'):

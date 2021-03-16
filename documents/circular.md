@@ -145,7 +145,7 @@
 
 
 ******
-<span style="color:#a77864">**rmw**</span>**(lon, lat, ws, clon, clat, maxdist=550, dr=1, box=True, \*\*kwargs)**
+<span style="color:#a77864">**rmw**</span>**(lon, lat, ws, clon, clat, maxdist=None, dr=None, dxdy=None)**
 
     Find TC RMW
     
@@ -157,24 +157,15 @@
         Wind speed
     clon, clat : scalar
         TC center longtitude / latitude
-    maxdist : scalar
-        The maximum search distance (km). Default is 550
-    dr : scalar
-        The radius (km) interval. Default is 1
-    box : bool
-        Create a box area that only calculate interpolation in this
-        box. Default is True.
-    **kwargs : 
-        Keyword arguments for `circular_avg`
+    maxdist : scalar. Optional
+        The maximum search distance (km)
+    dr : scalar. Optional
+        The radius (km) interval
+    dxdy : Tuple(dy_scalar, dx_scalar). Optional
+        Spatial resolution.
         
     Return
     ------
-    radius : 1d array, shape = (n,)
-        Radius, the coordinate of `axissym_ws`.
-        The distance between i'th `axissym_ws` profile location
-        and TC center is radius[i].
-    axissym_ws : 1d array, shape = (n,)
-        Axis-symmetric wind speed profile
     rmw : scalar
         Radius of maximum wind speed
 
