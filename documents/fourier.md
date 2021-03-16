@@ -4,13 +4,14 @@
 
 <span style="color:#a77864">**interp_xy_closure**</span>**(radius, theta, x, y, center=None)**
 
-    Interpolating data from radius-theta coordinate to x-y coordinate.
+    Same as `interp_xy`, but return a closure function to perform the interpolation.
 
 
 
 ******
 <span style="color:#a77864">**interp_xy**</span>**(radius, theta, values, x, y, center=None)**
 
+    Interpolating data from radius-theta coordinate to x-y coordinate.
 
 
 

@@ -79,8 +79,8 @@ fourier
 
 | Function / Class | Description |
 | :--------------- | :---------- |
-| <font color="#a77864"> **interp_xy_closure** </font> | Interpolating data from radius-theta coordinate to x-y coordinate. |
-| <font color="#a77864"> **interp_xy** </font> |  |
+| <font color="#a77864"> **interp_xy_closure** </font> | Same as `interp_xy`, but return a closure function to perform the interpolation. |
+| <font color="#a77864"> **interp_xy** </font> | Interpolating data from radius-theta coordinate to x-y coordinate. |
 | <font color="#a77864"> **CircularFourier** </font> | Perform Fourier transformation on circles. |
 
 

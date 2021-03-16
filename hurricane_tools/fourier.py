@@ -16,7 +16,7 @@ __all__ = [
 
 def interp_xy_closure(radius, theta, x, y, center=None):
     """
-    Interpolating data from radius-theta coordinate to x-y coordinate.
+    Same as `interp_xy`, but return a closure function to perform the interpolation.
     """
     if center is None:
         cx = 0
@@ -51,6 +51,9 @@ def interp_xy_closure(radius, theta, x, y, center=None):
 
 
 def interp_xy(radius, theta, values, x, y, center=None):
+    """
+    Interpolating data from radius-theta coordinate to x-y coordinate.
+    """
     interp_func = interp_xy_closure(radius, theta, x, y, center)
     return interp_func(values)
 
