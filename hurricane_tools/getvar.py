@@ -4,7 +4,7 @@ import pandas as pd
 from netCDF4 import Dataset, MFDataset
 
 from .destag import destagger
-from .fortran.f90tk import calc_tk, calc_tk_nd
+from .fortran.f90tk import calc_tk
 from .fortran.f90slp import dcomputeseaprs, dcomputeseaprs_nt
 from .fortran.f90dbz import calcdbz, calcdbz_nt
 from .fortran.f90vort import dcomputeabsvort, dcomputepv, dcomputeabsvort_nt, dcomputepv_nt
@@ -47,7 +47,7 @@ class GetVar:
         else:
             raise ValueError(f"Unavailable timeidx type: {type(timeidx)}")
         
-        # define f90 func
+        # define f90 func for diagnosis variables
         if self.ncfile.dimensions['Time'].size == 1:
             self._func = {
                 'tk': calc_tk,
@@ -59,7 +59,7 @@ class GetVar:
             
         else:
             self._func = {
-                'tk': calc_tk_nd,
+                'tk': calc_tk,     
                 'slp': dcomputeseaprs_nt,
                 'dbz': calcdbz_nt,
                 'avo': dcomputeabsvort_nt,
@@ -97,12 +97,14 @@ class GetVar:
         t = self.get('T')
         theta = np.squeeze(t + 300)
         
-        # convert to fortran type, and shape from (nz, ny, nx) to (nx, ny, nz)
-        pres = np.asfortranarray(pres.T)
-        theta = np.asfortranarray(theta.T)
+        # ravel to 1-d array and convert to fortran type
+        shape = pres.shape
+        pres = np.asfortranarray(pres.ravel())
+        theta = np.asfortranarray(theta.ravel())
         
-        tk = func_tk(pres, theta)
-        return np.asanyarray(tk.T, order='c')
+        # f90tk.calc_tk only allow 1-d array (for the efficiency)
+        tk = func_tk(pres, theta).reshape(shape)
+        return tk
 
     def _slp(self, func_slp):
         # read necessary variables
