@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 from scipy.interpolate import griddata
 from scipy.integrate import trapz, simps
@@ -243,7 +245,7 @@ def circular_avg_closure(lon, lat, clon, clat, radius, theta=None, dxdy=None):
     return inner
 
 
-def rmw(lon, lat, ws, clon, clat, maxdist=None, dr=None, dxdy=None):
+def rmw(lon, lat, ws, clon, clat, maxdist=None, mindist=None, dr=None, dxdy=None):
     """
     Find TC RMW
     
@@ -257,29 +259,21 @@ def rmw(lon, lat, ws, clon, clat, maxdist=None, dr=None, dxdy=None):
         TC center longtitude / latitude
     maxdist : scalar. Optional
         The maximum search distance (km)
+    mindist : scalar. Optional
+        The minimum search distance (km)
+        If None, it will be twice `dr`.
     dr : scalar. Optional
         The radius (km) interval
+        If None, it will be `max(dxdy)`.
     dxdy : Tuple(dy_scalar, dx_scalar). Optional
-        Spatial resolution.
+        Spatial resolution
+        It will be calculated from `lon` and `lat` if it is None.
         
     Return
     ------
     rmw : scalar
         Radius of maximum wind speed
     """
-    # find appropriate `maxdist`
-    n = 5
-    slc = (slice(n, -n), slice(n, -n))
-    dist_x = latlon2distance(clon, lat[slc], lon[slc], lat[slc])
-    dist_y = latlon2distance(lon[slc], clat, lon[slc], lat[slc])
-    _maxdist = min(dist_x.max(), dist_y.max())
-    
-    if maxdist is None:
-        maxdist = _maxdist
-    elif maxdist > _maxdist:
-        warnings.warn(f"`maxdist` is too large. Replace with {_maxdist:.2f}.")
-        maxdist = _maxdist
-    
     # find appropriate `dr`
     if dxdy is None:
         dx = latlon2distance(lon[:,1:], lat[:,1:], lon[:,:-1], lat[:,:-1]).mean()
@@ -290,10 +284,33 @@ def rmw(lon, lat, ws, clon, clat, maxdist=None, dr=None, dxdy=None):
     if dr is None: 
         dr = max(dx, dy)
         
+    # find appropriate `maxdist`
+    n = 7
+    slc = (slice(n, -n), slice(n, -n))
+    dist_x = latlon2distance(clon, lat[slc], lon[slc], lat[slc])
+    dist_y = latlon2distance(lon[slc], clat, lon[slc], lat[slc])
+    _maxdist = min(dist_x.max(), dist_y.max())
+    
+    if maxdist is None:
+        maxdist = _maxdist
+    elif maxdist > _maxdist:
+        warnings.warn(f"`maxdist` is too large. Replace with {_maxdist:.2f}.")
+        maxdist = _maxdist
+        
+    # find `mindist`
+    if mindist is None:
+        mindist = 2 * dr
+    if mindist >= maxdist:
+        raise ValueError("`mindist` >= `maxdist`.")
+        
     # interpolate
-    radius = np.arange(0, maxdist, dr)
+    radius = np.arange(mindist, maxdist, dr)
     axisym_ws = circular_avg(lon, lat, ws, clon, clat, radius, dxdy=(dx, dy))
-    return radius[axisym_ws.argmax()]
+    
+    if all(np.isnan(axisym_ws)):
+        raise ValueError("Interpolated axisymmetric wind speed is all-NaN. Try to reduce `max_dist`.")
+    
+    return radius[np.nanargmax(axisym_ws)]
 
 
 def axisymmetricity(lon, lat, var, radius, clon, clat, dxdy=None, integ='trapz'):

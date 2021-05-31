@@ -145,7 +145,7 @@
 
 
 ******
-<span style="color:#a77864">**rmw**</span>**(lon, lat, ws, clon, clat, maxdist=None, dr=None, dxdy=None)**
+<span style="color:#a77864">**rmw**</span>**(lon, lat, ws, clon, clat, maxdist=None, mindist=None, dr=None, dxdy=None)**
 
     Find TC RMW
     
@@ -159,10 +159,15 @@
         TC center longtitude / latitude
     maxdist : scalar. Optional
         The maximum search distance (km)
+    mindist : scalar. Optional
+        The minimum search distance (km)
+        If None, it will be twice `dr`.
     dr : scalar. Optional
         The radius (km) interval
+        If None, it will be `max(dxdy)`.
     dxdy : Tuple(dy_scalar, dx_scalar). Optional
-        Spatial resolution.
+        Spatial resolution
+        It will be calculated from `lon` and `lat` if it is None.
         
     Return
     ------
