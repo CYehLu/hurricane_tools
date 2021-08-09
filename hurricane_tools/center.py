@@ -9,7 +9,7 @@ __all__ = [
 
 def tc_center_mslp(lon, lat, slp):
     """
-    Find TC center by minimum sea level pressure grid (no weighted).
+    Find TC center by finding the grid of minimum sea level pressure.
     
     Parameter
     ---------
@@ -27,7 +27,7 @@ def tc_center_mslp(lon, lat, slp):
     return clon, clat
     
 
-def weighted_tc_center(lon, lat, var, clon=None, clat=None, L=12):
+def weighted_tc_center(lon, lat, var, center_fg=None, L=12):
     """
     Calculate TC center by weighted method.
     
@@ -39,18 +39,22 @@ def weighted_tc_center(lon, lat, var, clon=None, clat=None, L=12):
         2-d numpy ndarray. Used for determination the center of TC, usually
         is sea level pressure.
         Its shape should equal to lon and lat.
-    clon, clat:
-        scalar. The first gauess of TC center.
-        If None (default), it would use the result of `tc_center_mslp`.
+    center_fg:
+        Tuple(scalar, scalar). Optional
+        The first guess of TC center (lon, lat).
+        If None, it would use the result of `tc_center_mslp`.
     L:
         int. The half length of weighted box edge length. Default is 12.
         
     Return:
     ------
-    tuple, (weighted_center_lon, weighted_center_lat). 
+    Tuple(scalar, scalar)
+        weighted TC center (lon, lat). 
     """
-    if clon is None and clat is None:
+    if center_fg is None:
         clon, clat = tc_center_mslp(lon, lat, var)
+    else:
+        clon, clat = center_fg
     
     # find the nearest grid point to clon and clat
     diff_lon = np.abs(lon - clon)

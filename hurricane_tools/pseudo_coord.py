@@ -1,5 +1,5 @@
 import numpy as np
-from .distance import latlon2distance, find_lonlat_with_distance
+from .distance import latlon2distance, find_dlonlat_by_distance
 
 
 __all__ = [
@@ -12,18 +12,19 @@ def lonlat2xy(lon, lat, clon, clat):
     """
     Convert to distance-based coordinate.
     
-    Parameter:
+    Parameter
     ---------
     lon, lat : 2d array, shape = (ny, nx)
         Longtitude and latitude
     clon, clat : scalar
         Center longtitude-latitude coordinate
         
-    Return:
+    Return
     ------
     X, Y : 2d array, shape = (ny, nx)
         `X` is the zonal distance between each lon-lat coordinate points and
-        the center coordinate, and `Y` is the meridional distance.
+        the center coordinate, and `Y` is the meridional distance. 
+        Unit is km.
     """
     X = latlon2distance(clon, lat, lon, lat)    # (ny, nx)
     Y = latlon2distance(lon, clat, lon, lat)
@@ -36,7 +37,7 @@ def xy2lonlat(X, Y, clon=None, clat=None, equal_dist=True):
     """
     Convert to longtitude-latitude coordinate.
     
-    Parameter:
+    Parameter
     ---------
     X, Y : 2d array, shape = (ny, nx)
         `X` is the zonal distance between each grid points and the center
@@ -49,7 +50,7 @@ def xy2lonlat(X, Y, clon=None, clat=None, equal_dist=True):
         grids is nearly equal.
         This can only be True now.
         
-    Return:
+    Return
     ------
     lon, lat : 2d array, shape = (ny, nx)
         Longtitude and Latitude.
@@ -67,14 +68,14 @@ def xy2lonlat(X, Y, clon=None, clat=None, equal_dist=True):
         
     # calculate `dlon` (shape=(ny,)) and `dlat` (shape=(nx,))
     if np.allclose(dx, dx[0]):
-        dlon = np.ones((ny,)) * find_lonlat_with_distance(clon, clat, dx[0], 'x')
+        dlon = np.ones((ny,)) * find_dlonlat_by_distance(clon, clat, dx[0], 'x')
     else:
-        dlon = np.array([find_lonlat_with_distance(clon, clat, d, 'x') for d in dx])
+        dlon = np.array([find_dlonlat_by_distance(clon, clat, d, 'x') for d in dx])
         
     if np.allclose(dy, dy[0]):
-        dlat = np.ones((nx,)) * find_lonlat_with_distance(clon, clat, dy[0], 'y')
+        dlat = np.ones((nx,)) * find_dlonlat_by_distance(clon, clat, dy[0], 'y')
     else:
-        dlat = np.array([find_lonlat_with_distance(clon, clat, d, 'y') for d in dy])
+        dlat = np.array([find_dlonlat_by_distance(clon, clat, d, 'y') for d in dy])
         
     isevenx = (nx+1) % 2
     iseveny = (ny+1) % 2

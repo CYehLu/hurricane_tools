@@ -4,16 +4,17 @@ from scipy.optimize import root
 
 __all__ = [
     'latlon2distance',
-    'find_lonlat_with_distance'
+    'find_dlonlat_by_distance'
 ]
 
 
 def latlon2distance(lon1, lat1, lon2, lat2):
-    """calculate the distance (km) of two positions"""
-    # approximate radius of earth in km
-    R = 6373.0
+    """
+    Calculate the distance (km) between two points in longitude/latitude coordinate.
+    Units of parameters are degree.
+    """
+    R = 6373.0    # approximate radius of earth (km)
     
-    # convert to radians
     lat1 = np.radians(lat1)
     lon1 = np.radians(lon1)
     lat2 = np.radians(lat2)
@@ -24,28 +25,31 @@ def latlon2distance(lon1, lat1, lon2, lat2):
     
     a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
     c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1-a))
-    
     return R * c
 
 
-def find_lonlat_with_distance(clon, clat, distance, xy):
+def find_dlonlat_by_distance(clon, clat, distance, xy):
     """
-    Find the longtitude/latitude which the horizontal or vertical distance
-    to the (clon, clat) is equal to 'distance'.
+    Find the difference of longitude/latitude which the zonal/meridional
+    distance to the (clon, clat) is equal to `distance`.
     
-    Parameters:
+    Parameters
     ----------
-    clon, clat: scaler. The reference coordinate.
-    distance: scaler. The distance (km) between target coordinate and (clon, clat).
+    clon, clat: scaler, unit: degree
+        The reference coordinate 
+    distance: scaler, unit: km
+        The distance between target coordinate and (clon, clat).
     xy: str, 'x' or 'y'. 
-        If x, it will find the coordinate which distance along latitude line is
-        equal to 'distance' (The horizontal distance).
-        If y, it will find the coordinate which distance along longtitude line is
-        equal to 'distance' (The vertical distance).
+        If xy == `x`:
+            return value = `dlon`, that is the distance between (clon, clat) and
+            (clon+dlon, clat) = `distance`.
+        If xy == `y`:
+            return value = `dlat`, that is the distance between (clon, clat) and
+            (clon, clat+dlat) = `distance`.
         
-    Return:
+    Return
     ------
-    scaler, the difference of lon/lat degree
+    scaler (unit: degree), the difference of longitude or latitude degree.
     """
     if xy == 'x':
         f = lambda ll: latlon2distance(clon, clat, ll, clat) - distance

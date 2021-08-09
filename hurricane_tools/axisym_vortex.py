@@ -17,7 +17,7 @@ def rankine_vortex(r, vmax, rmax, alpha=1):
            |- Vmax * (r / Rmax)**(-α) , if r > Rmax
     in the classic case, α = 1.
     
-    Parameters:
+    Parameters
     ----------
     r : scalar, 1-d array-like or 2-d array-like
         Radius
@@ -28,7 +28,7 @@ def rankine_vortex(r, vmax, rmax, alpha=1):
     alpha : scalar, optional
         The wind speed decrease rate outside Rmax. Default is 1.
         
-    Return:
+    Return
     ------
     V : scalar, 1-d array-like or 2-d array-like
         Tangential wind speed.
@@ -53,7 +53,7 @@ def holland80(r, pc, pn, A, B, rho=None, f=None):
     radius of maximum wind = A ** (1/B)
     maximum wind speed = sqrt(B * (pn - pc) / (rho * e)), where e is nature logarithms.
     
-    Parameters:
+    Parameters
     ----------
     r : scalar, 1-d array-like or 2-d array-like
         Radius
@@ -68,12 +68,12 @@ def holland80(r, pc, pn, A, B, rho=None, f=None):
     f : scalar, optional
         Coriolis coefficient. Default is 10**-5.
         
-    Return:
+    Return
     ------
     V : scalar, 1-d array-like or 2-d array-like
         Tangential wind speed.
         
-    Reference:
+    Reference
     ---------
     [1] G. J. Holland, "An Analytic Model of the Wind and Pressure Profiles in Hurricanes"
         Mon. Wea. Rev., 108, 1212–1218
@@ -102,7 +102,7 @@ def willoughby04(r, vmax, rmax, n, X1, X2, A, twidth):
     """
     The empirical formula of TC axisymmetric structure by Willoughby (2006).
     
-    Reference:
+    Reference
     ---------
     [1] H. E. Willoughby, R. W. R. Darling, M. E. Rahn, "Parametric Representation of the Primary 
         Hurricane Vortex. Part II: A New Family of Sectionally Continuous Profiles"

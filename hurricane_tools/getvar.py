@@ -3,18 +3,52 @@ import numpy as np
 import pandas as pd
 from netCDF4 import Dataset, MFDataset
 
-from .destag import destagger
 from .fortran.f90tk import calc_tk
 from .fortran.f90slp import dcomputeseaprs, dcomputeseaprs_nt
 from .fortran.f90dbz import calcdbz, calcdbz_nt
 from .fortran.f90vort import dcomputeabsvort, dcomputepv, dcomputeabsvort_nt, dcomputepv_nt
-from .fortran.f90interp import find_level_1, find_level_n, calc_weights_1, calc_weights_n, interpz3d_1, interpz3d_n
 
 
 __all__ = [
-    'GetVar',
-    'Interpz3d'
+    'destagger',
+    'GetVar'
 ]
+
+
+def destagger(var, stagger_dim):
+    """
+    Convert variable from staggered to unstagger grid.
+    
+    This is almost exactly the same as `wrf.destagger`, but I simplified to 
+    destagger process and restricted the `stagger_dim` to one of z, y, or, x
+    dimension to improve the efficiency.
+    
+    Parameter
+    ---------
+    var : ndarray
+        The variable on the staggered grid. The dimensions of this variable
+        must be (..., z, y, x) or (..., y, x). 
+    stagger_dim : int
+        The dimension index to destagger.
+        Only the rightmost 3 dimensions (z, y, or x) can be destaggered.
+    
+    Return
+    ------
+    Variable on the unstaggered grid.
+    """
+    ndim = var.ndim
+    
+    # sdim: -1 (x stagger), -2 (y stagger) or -3 (z stagger)
+    sdim = stagger_dim - ndim if stagger_dim >= 0 else stagger_dim
+        
+    if sdim == -1:
+        return (var[...,1:] + var[...,:-1]) / 2
+    elif sdim == -2:
+        return (var[...,1:,:] + var[...,:-1,:]) / 2
+    elif sdim == -3:
+        return (var[...,1:,:,:] + var[...,:-1,:,:]) / 2
+    else:
+        raise ValueError("Unavailable stagger_dim (must be one of the three rightmost dimensions).")
 
 
 class GetVar:
@@ -349,94 +383,3 @@ class GetVar:
                 raise ValueError(f"`filled` can only be bool, int or float, not {type(filled)}")
         
         return var
-
-        
-class Interpz3d:
-    """
-    Interpolating variables on specified vertical coordinate.
-    
-    Example
-    -------
-    >>> u, v, phi, temp, pres = get_data()          # a fake function to get data
-    >>> interp_obj = Interpz3d(pres, [900, 850])    # interpolate variables on 900 and 850 hPa
-    >>> u850, v850, phi850, temp850 = interp_obj.interp(u, v, phi, temp)   
-    >>> u850.shape     # (2, ny, nx)
-    """
-    
-    def __init__(self, zdata, level, missing_value=np.nan):
-        """
-        Initialize with pressure and levels.
-        
-        Parameter
-        ---------
-        zdata : 3-d array, shape = (nz, ny, nx)
-            vertical coordinate variable. e.g pressure
-        level : scalar, or 1-d array-like with shape = (nlev,)
-            interpolated `zdata` levels
-        missing_value : scalar, optional
-            Assign missing value. Default is `np.nan`
-        """     
-        self.zdata = zdata
-        self.level = np.array(level)
-        self.missing_value = missing_value
-        
-        if isinstance(level, (int, float)):
-            find_level_func = find_level_1
-            find_weight_func = calc_weights_1
-            self._interpz3d_func = interpz3d_1
-        elif isinstance(level, (list, np.ndarray)):
-            find_level_func = find_level_n
-            find_weight_func = calc_weights_n
-            self._interpz3d_func = interpz3d_n
-        else:
-            raise ValueError(f"Unavailable `level` type : {type(level)}")
-            
-        # find level index and weight
-        zdata_f = np.asfortranarray(zdata.T)
-        lev_idx = find_level_func(zdata_f, level)    # (nx, ny, nlev)
-        weight = find_weight_func(zdata_f, level, lev_idx)    # (nx, ny, nlev)
-        
-        self._zdata_f = zdata_f
-        self._lev_idx = lev_idx
-        self._weight = weight
-    
-    def interp(self, *var):
-        """
-        Interpolate
-        
-        Parameter
-        ---------
-        *var : 3-d array, shape = (nz, ny, nx)
-            Interpolated variables. Their shapes should be the same.
-            
-        Return
-        ------
-        If len(var) == 1, it would return a interpolated variable with shape = (nlev, ny, nx)
-        If len(var) > 1, it would return a list which elements are interpolated variable and
-        shape = (nlev, ny, nx).
-        """
-        nz = self.zdata.shape[0]
-        lev_idx = self._lev_idx
-        weight = self._weight
-        
-        interpz3d_func = self._interpz3d_func
-        missing_value = self.missing_value
-        
-        if len(var) == 1:
-            v_f = np.asfortranarray(var[0].T)
-            v_interp = interpz3d_func(v_f, lev_idx, weight)   # (nx, ny)
-            v_interp[lev_idx == 0] = np.nan
-            v_interp[lev_idx == nz] = np.nan
-            return v_interp.T
-        
-        else:
-            var_interp = []
-        
-            for v in var:
-                v_f = np.asfortranarray(v.T)
-                v_interp = interpz3d_func(v_f, lev_idx, weight)   # (nx, ny, nlev)
-                v_interp[lev_idx == 0] = missing_value
-                v_interp[lev_idx == nz] = missing_value
-                var_interp.append(v_interp.T)
-            
-            return var_interp

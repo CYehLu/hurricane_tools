@@ -3,5 +3,5 @@ __pycache__/
 bst_all/
 hurricane_tools.egg-info
 *.so
-wrfout*
 .f90*
+examples/
