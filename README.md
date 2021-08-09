@@ -34,7 +34,7 @@ then install it by pip
     $ pip install -e ./hurricane_tools
     
 
-## Compile Fortran files
+### Compile Fortran files
 Some functions will use Fortran subroutines defined in `hurricane_tools/fortran/`. The functions that will use Fortran subroutines are listed below:
 
 * `hurricane_tools.coord_transform.XY2RT(..., intp='fortran')`
