@@ -50,6 +50,8 @@ class XY2RT:
     
     def __init__(self, lon, lat, clon, clat, radius, theta=None, dxdy=None, intp=None):
         """
+        Initialization.
+        
         Parameters
         ----------
         lon, lat: 2-d array, shape = (ny, nx)
@@ -126,6 +128,8 @@ class XY2RT:
     
     def __call__(self, var):
         """
+        Interpolate data from cartesian (x-y) to polar (radius-theta) coordinate.
+        
         Parameter
         ---------
         var: 2-d array, shape = (ny, nx)
@@ -172,13 +176,13 @@ class XY2RT:
         # FastGriddata instance
         fgd_obj = FastGriddata(dist_lonlat_b, circle_pts)
 
-        def inner(values):
+        def _inner(values):
             values_b = values[box_slice]
             val_b = values_b.ravel()
             interp = fgd_obj.interpolate(val_b)
             return interp.reshape(nrad, nthe)
 
-        return inner
+        return _inner
     
     def _prepare_xy2rt_f90(self, lon, lat, clon, clat, radius, theta, dxdy):
         """return a function to perform interpolation by fortran method"""
@@ -193,10 +197,10 @@ class XY2RT:
             dx, dy
         )
         
-        def inner(values):
+        def _inner(values):
             return f90xy2rt.interp_xy2rt(grididx, weights, np.asfortranarray(values))
         
-        return inner
+        return _inner
     
     
 class RT2XY:
@@ -221,6 +225,8 @@ class RT2XY:
     
     def __init__(self, lon, lat, clon, clat, radius, theta, intp=None):
         """
+        Initialization.
+        
         Parameters
         ----------
         lon, lat: 2-d array, shape = (ny, nx)
@@ -267,6 +273,8 @@ class RT2XY:
     
     def __call__(self, var):
         """
+        Interpolate data from polar (radius-theta) to cartesian (x-y) coordinate.
+        
         Parameter
         ---------
         var: 2-d array, shape = (nradius, ntheta)
@@ -291,10 +299,10 @@ class RT2XY:
         
         fgd_obj = FastGriddata(polar_coord, interp_coord)
         
-        def inner(values):
+        def _inner(values):
             return fgd_obj.interpolate(values.ravel()).reshape(X.shape)
         
-        return inner
+        return _inner
     
     def _prepare_rt2xy_f90(self, lon, lat, clon, clat, radius, theta):
         """return a function to perform interpolation by fortran method"""
@@ -307,10 +315,10 @@ class RT2XY:
             radius, theta
         )
         
-        def inner(values): 
+        def _inner(values): 
             return f90rt2xy.interp_rt2xy(radius, theta, radthe_idx, radthe, np.asfortranarray(values))
         
-        return inner
+        return _inner
 
 
 class Interpz3d:
@@ -332,9 +340,13 @@ class Interpz3d:
         Parameter
         ---------
         zdata : 3-d array, shape = (nz, ny, nx)
-            vertical coordinate variable. e.g pressure
+            The variable of new vertical coordinate. e.g pressure or height
         level : scalar, or 1-d array-like with shape = (nlev,)
-            interpolated `zdata` levels
+            The desired vertical levels. 
+            For example, `Interpz3d(pressure, [900, 850])` indicates that the variables would be 
+            interpolated on 900 and 850 hPa vertical levels.
+            Note that extrapolation is not allowed. If some values in `level` are out of the range
+            of `zdata`, the interpolated value will be assigned to `missing_value`.
         missing_value : scalar, optional
             Assign missing value. Default is `np.nan`
         """     
@@ -367,18 +379,19 @@ class Interpz3d:
     
     def interp(self, *var):
         """
-        Interpolate
+        Interpolate variable from the original vertical coordinate to `zdata` coordinate.
         
         Parameter
         ---------
         *var : 3-d array, shape = (nz, ny, nx)
-            Interpolated variables. Their shapes should be the same.
+            Any number of variables to be interpolated. Their shapes should be equal to `zdata`.
             
         Return
         ------
-        If len(var) == 1, it would return a interpolated variable with shape = (nlev, ny, nx)
-        If len(var) > 1, it would return a list which elements are interpolated variable and
-        shape = (nlev, ny, nx).
+        If len(var) == 1:
+            Interpolated variable. 3-d array, shape = (nlev, ny, nx)
+        If len(var) > 1:
+            List of interpolated variables. List[Array_3d], shape of each array = (nlev, ny, nx)
         """
         nz = self.zdata.shape
         lev_idx = self._lev_idx
