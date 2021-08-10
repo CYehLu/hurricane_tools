@@ -38,6 +38,7 @@ then install it by pip
 Some functions will use Fortran subroutines defined in `hurricane_tools/fortran/`. The functions that will use Fortran subroutines are listed below:
 
 * `hurricane_tools.coord_transform.XY2RT(..., intp='fortran')`
+* `hurricane_tools.coord_transform.RT2XY(..., intp='fortran')`
 * `hurricane_tools.coord_transform.Interpz3d`
 * `hurricane_tools.getvar.GetVar`
 * Any function with argument `intp='fortran'` or the global variable `hurricane_tools.config.INTERP_OPTION = 'fortran'`  
