@@ -357,11 +357,11 @@ class Interpz3d:
         self.level = np.array(level)
         self.missing_value = missing_value
         
-        if isinstance(level, (int, float)):
+        if isinstance(level, (int, float, np.integer, np.floating)):
             find_level_func = find_level_1
             find_weight_func = calc_weights_1
             self._interpz3d_func = interpz3d_1
-        elif isinstance(level, (list, np.ndarray)):
+        elif isinstance(level, (tuple, list, np.ndarray)):
             find_level_func = find_level_n
             find_weight_func = calc_weights_n
             self._interpz3d_func = interpz3d_n
@@ -406,8 +406,7 @@ class Interpz3d:
             
             v_f = np.asfortranarray(var[0].T)
             v_interp = interpz3d_func(v_f, lev_idx, weight)   # (nx, ny)
-            v_interp[lev_idx == 0] = np.nan
-            v_interp[lev_idx == nz] = np.nan
+            v_interp = np.where((lev_idx == 0) | (lev_idx == nz), missing_value, v_interp)
             return v_interp.T
         
         else:
@@ -419,8 +418,7 @@ class Interpz3d:
                     
                 v_f = np.asfortranarray(v.T)
                 v_interp = interpz3d_func(v_f, lev_idx, weight)   # (nx, ny, nlev)
-                v_interp[lev_idx == 0] = missing_value
-                v_interp[lev_idx == nz] = missing_value
+                v_interp = np.where((lev_idx == 0) | (lev_idx == nz), missing_value, v_interp)
                 var_interp.append(v_interp.T)
             
             return var_interp
