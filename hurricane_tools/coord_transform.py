@@ -356,15 +356,18 @@ class Interpz3d:
         self.zdata = zdata
         self.level = np.array(level)
         self.missing_value = missing_value
+        self._nz = zdata.shape[0]
         
         if isinstance(level, (int, float, np.integer, np.floating)):
             find_level_func = find_level_1
             find_weight_func = calc_weights_1
             self._interpz3d_func = interpz3d_1
+            
         elif isinstance(level, (tuple, list, np.ndarray)):
             find_level_func = find_level_n
             find_weight_func = calc_weights_n
             self._interpz3d_func = interpz3d_n
+            
         else:
             raise ValueError(f"Unavailable `level` type : {type(level)}")
             
@@ -393,7 +396,7 @@ class Interpz3d:
         If len(var) > 1:
             List of interpolated variables. List[Array_3d], shape of each array = (nlev, ny, nx)
         """
-        nz = self.zdata.shape
+        nz = self._nz
         lev_idx = self._lev_idx
         weight = self._weight
         
