@@ -6,6 +6,11 @@ class <span style="color:#a77864">**XY2RT**</span>
 
     Coordinate transformation from cartesian (x-y) to polar (radius-theta) coordinate.
     
+    Note
+    ----
+    When the fortran routine is used, the performance will be further better if the 
+    data types of all numpy array are `np.float32`.
+    
     Example
     -------
     >>> from hurricane_tools import coord_transform
@@ -53,15 +58,16 @@ class <span style="color:#a77864">**XY2RT**</span>
             
         Note
         ----
-        griddata: 
-            Slower, need more data points around the interpolation point.
-            Slightly more accurate.
-            Only depends on python/numpy/scipy.
-        fortran:
-            Faster, only need 4 data points around the interpolation point.
-            Slightly less accurate.
-            Need to compile fortran code before using it (I only test it on linux system with
-            gfortran compiler).
+        Comparison between intp='griddata' and 'fortran'
+            griddata: 
+                Slower, need more data points around the interpolation point.
+                Slightly more accurate.
+                Only depends on python/numpy/scipy.
+            fortran:
+                Faster, only need 4 data points around the interpolation point.
+                Slightly less accurate.
+                Need to compile fortran code before using it (I only test it on linux system with
+                gfortran compiler).
 
   
 <span style="color:#cca99b">XY2RT</span>.<span style="color:#a77864">**\_\_call\_\_**</span>**(self, var)**
@@ -82,6 +88,11 @@ class <span style="color:#a77864">**XY2RT**</span>
 class <span style="color:#a77864">**RT2XY**</span>
 
     Coordinate transformation from polar (radius-theta) to cartesian (x-y) coordinate.
+    
+    Note
+    ----
+    When the fortran routine is used, the performance will be further better if the 
+    data types of all numpy array are `np.float32`.
     
     Example
     -------
@@ -145,6 +156,10 @@ class <span style="color:#a77864">**RT2XY**</span>
 class <span style="color:#a77864">**Interpz3d**</span>
 
     Interpolating variables on specified vertical coordinate.
+    
+    Note
+    ----
+    The performance will be further better if the data types of all numpy array are `np.float64`.
     
     Example
     -------
