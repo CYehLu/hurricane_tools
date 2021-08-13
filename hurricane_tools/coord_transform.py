@@ -31,9 +31,20 @@ __all__ = [
 ]
 
 
+def _convert_dtype(arr, dtype):
+    if arr.dtype != np.dtype(dtype):
+        arr = arr.astype(dtype, copy=False)
+    return arr
+
+
 class XY2RT:
     """
     Coordinate transformation from cartesian (x-y) to polar (radius-theta) coordinate.
+    
+    Note
+    ----
+    When the fortran routine is used, the performance will be further better if the 
+    data types of all numpy array are `np.float32`.
     
     Example
     -------
@@ -75,57 +86,59 @@ class XY2RT:
             
         Note
         ----
-        griddata: 
-            Slower, need more data points around the interpolation point.
-            Slightly more accurate.
-            Only depends on python/numpy/scipy.
-        fortran:
-            Faster, only need 4 data points around the interpolation point.
-            Slightly less accurate.
-            Need to compile fortran code before using it (I only test it on linux system with
-            gfortran compiler).
-        """
+        Comparison between intp='griddata' and 'fortran'
+            griddata: 
+                Slower, need more data points around the interpolation point.
+                Slightly more accurate.
+                Only depends on python/numpy/scipy.
+            fortran:
+                Faster, only need 4 data points around the interpolation point.
+                Slightly less accurate.
+                Need to compile fortran code before using it (I only test it on linux system with
+                gfortran compiler).
+        """        
+        lon = _convert_dtype(lon, 'float32')
+        lat = _convert_dtype(lat, 'float32')
         
         if theta is None:
-            theta = np.deg2rad(np.arange(360))
+            theta = np.deg2rad(np.arange(360), dtype=np.float32)
             
         # convert `radius` to be iterable
-        if isinstance(radius, (int, float)):
-            radius = np.array([radius])
+        if isinstance(radius, (int, float, np.integer, np.floating)):
+            radius = np.array([radius], dtype=np.float32)
         elif isinstance(radius, (list, tuple)):
-            radius = np.array(radius)
+            radius = np.array(radius, dtype=np.float32)
+        elif isinstance(radius, np.ndarray):
+            radius = _convert_dtype(radius, 'float32')
             
         if dxdy is None:
             dx = latlon2distance(lon[0,0], lat[0,0], lon[0,1], lat[0,0])
             dy = latlon2distance(lon[0,0], lat[0,0], lon[0,0], lat[1,0])
             dxdy = (dx, dy)
-        
+               
         # check interpolate option
-        if intp is None:
+        if intp == 'griddata':
+            self._intp = 'griddata'
+        elif intp == 'fortran':
+            self._intp = 'fortran'
+        elif intp is None:
             if config.INTERP_OPTION == 'griddata':
-                self._intp_func = self._prepare_xy2rt_griddata(lon, lat, clon, clat, radius, theta, dxdy)
-                
+                self._intp = 'griddata'
             elif config.INTERP_OPTION == 'fortran':
-                if _has_import_f90xy2rt:
-                    self._intp_func = self._prepare_xy2rt_f90(lon, lat, clon, clat, radius, theta, dxdy)
-                else:
-                    raise ModuleNotFoundError("The fortran modules haven't been compiled.")
-                    
+                self._intp = 'fortran'
             else:
                 raise ValueError("`config.INTERP_OPTION` must be 'griddata' or 'fortran'.")
-            
-        elif intp == 'griddata':
-            self._intp_func = self._prepare_xy2rt_griddata(lon, lat, clon, clat, radius, theta, dxdy)
-        
-        elif intp == 'fortran':
-            if _has_import_f90xy2rt:
-                self._intp_func = self._prepare_xy2rt_f90(lon, lat, clon, clat, radius, theta, dxdy)
-            else:
-                raise ModuleNotFoundError("The fortran modules haven't been compiled.")
-                
         else:
             raise ValueError("`intp` must be None, 'griddata' or 'fortran'.")
-    
+            
+        if (self._intp == 'fortran') and (not _has_import_f90xy2rt):
+            raise ModuleNotFoundError("The Fortran modules haven't been compiled.")
+            
+        if self._intp == 'griddata':
+            self._intp_func = self._prepare_xy2rt_griddata(lon, lat, clon, clat, radius, theta, dxdy)
+        elif self._intp == 'fortran':
+            self._intp_func = self._prepare_xy2rt_f90(lon, lat, clon, clat, radius, theta, dxdy)
+            
     def __call__(self, var):
         """
         Interpolate data from cartesian (x-y) to polar (radius-theta) coordinate.
@@ -139,6 +152,8 @@ class XY2RT:
         ------
         Interpolating result, shape = (nradius, ntheta)
         """
+        if self._intp == 'fortran':
+            var = _convert_dtype(var, 'float32')
         return self._intp_func(var)
         
     def _prepare_xy2rt_griddata(self, lon, lat, clon, clat, radius, theta, dxdy):
@@ -207,6 +222,11 @@ class RT2XY:
     """
     Coordinate transformation from polar (radius-theta) to cartesian (x-y) coordinate.
     
+    Note
+    ----
+    When the fortran routine is used, the performance will be further better if the 
+    data types of all numpy array are `np.float32`.
+    
     Example
     -------
     >>> from hurricane_tools import coord_transform
@@ -244,32 +264,35 @@ class RT2XY:
             The difference between these two methods can be seen in `Note` in `XY2RT`.
             If None (default), it would use the setting in `config.INTERP_OPTION`.
         """
+        lon = _convert_dtype(lon, 'float32')
+        lat = _convert_dtype(lat, 'float32')
+        radius = _convert_dtype(radius, 'float32')
+        theta = _convert_dtype(theta, 'float32')
+        
         theta = np.mod(theta, 2*np.pi)
         
-        if intp is None:
+        # check interpolate option
+        if intp == 'griddata':
+            self._intp = 'griddata'
+        elif intp == 'fortran':
+            self._intp = 'fortran'
+        elif intp is None:
             if config.INTERP_OPTION == 'griddata':
-                self._intp_func = self._prepare_rt2xy_griddata(lon, lat, clon, clat, radius, theta)
-                
+                self._intp = 'griddata'
             elif config.INTERP_OPTION == 'fortran':
-                if _has_import_f90rt2xy:
-                    self._intp_func = self._prepare_rt2xy_f90(lon, lat, clon, clat, radius, theta)
-                else:
-                    raise ModuleNotFoundError("The fortran modules haven't been compiled.")
-                    
+                self._intp = 'fortran'
             else:
                 raise ValueError("`config.INTERP_OPTION` must be 'griddata' or 'fortran'.")
-            
-        elif intp == 'griddata':
-            self._intp_func = self._prepare_rt2xy_griddata(lon, lat, clon, clat, radius, theta)
-        
-        elif intp == 'fortran':
-            if _has_import_f90rt2xy:
-                self._intp_func = self._prepare_rt2xy_f90(lon, lat, clon, clat, radius, theta)
-            else:
-                raise ModuleNotFoundError("The fortran modules haven't been compiled.")
-                
         else:
             raise ValueError("`intp` must be None, 'griddata' or 'fortran'.")
+            
+        if (self._intp == 'fortran') and (not _has_import_f90xy2rt):
+            raise ModuleNotFoundError("The Fortran modules haven't been compiled.")
+            
+        if self._intp == 'griddata':
+            self._intp_func = self._prepare_rt2xy_griddata(lon, lat, clon, clat, radius, theta)
+        elif self._intp == 'fortran':
+            self._intp_func = self._prepare_rt2xy_f90(lon, lat, clon, clat, radius, theta)
     
     def __call__(self, var):
         """
@@ -283,6 +306,8 @@ class RT2XY:
         ------
         Interpolating result, shape = (ny, nx)
         """
+        if self._intp == 'fortran':
+            var = _convert_dtype(var, 'float32')
         return self._intp_func(var)
     
     def _prepare_rt2xy_griddata(self, lon, lat, clon, clat, radius, theta):
@@ -325,6 +350,10 @@ class Interpz3d:
     """
     Interpolating variables on specified vertical coordinate.
     
+    Note
+    ----
+    The performance will be further better if the data types of all numpy array are `np.float64`.
+    
     Example
     -------
     >>> u, v, phi, temp, pres = get_data()          # a fake function to get data
@@ -353,8 +382,8 @@ class Interpz3d:
         if not _has_import_f90interpz:
             raise ModuleNotFoundError("The fortran modules haven't been compiled.")
         
-        self.zdata = zdata
-        self.level = np.array(level)
+        self.zdata = _convert_dtype(zdata, 'float64')
+        self.level = np.array(level, dtype='float64')
         self.missing_value = missing_value
         self._nz = zdata.shape[0]
         
@@ -404,10 +433,12 @@ class Interpz3d:
         missing_value = self.missing_value
         
         if len(var) == 1:
-            if var[0].shape != self.zdata.shape:
+            v = _convert_dtype(var[0], 'float64')
+            
+            if v.shape != self.zdata.shape:
                 raise ValueError("The shape of input array should be equal to `zdata`.")
             
-            v_f = np.asfortranarray(var[0].T)
+            v_f = np.asfortranarray(v.T)
             v_interp = interpz3d_func(v_f, lev_idx, weight)   # (nx, ny)
             v_interp = np.where((lev_idx == 0) | (lev_idx == nz), missing_value, v_interp)
             return v_interp.T
@@ -416,6 +447,8 @@ class Interpz3d:
             var_interp = []
         
             for v in var:
+                v = _convert_dtype(v, 'float64')
+                
                 if v.shape != self.zdata.shape:
                     raise ValueError("The shape of input array should be equal to `zdata`.")
                     
