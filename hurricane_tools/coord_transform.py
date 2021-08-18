@@ -18,7 +18,8 @@ except ModuleNotFoundError:
     _has_import_f90rt2xy = False
 
 try:
-    from .fortran.f90interpz import find_level_1, find_level_n, calc_weights_1, calc_weights_n, interpz3d_1, interpz3d_n
+    from .fortran.f90interpz import mod_interpz as f90intp
+    #from .fortran.f90interpz import find_level_1, find_level_n, calc_weights_1, calc_weights_n, interpz3d_1, interpz3d_n
     _has_import_f90interpz = True
 except ModuleNotFoundError:
     _has_import_f90interpz = False
@@ -352,7 +353,10 @@ class Interpz3d:
     
     Note
     ----
-    The performance will be further better if the data types of all numpy array are `np.float64`.
+    The performance will be better if the data types of numpy arrays are all `np.float32`
+    or all `np.float64`.
+    If the types of arrays are not all identical, or the types are not `np.float32` or
+    `np.float64`, implicitly type conversion is needed and the performance will be affected.
     
     Example
     -------
@@ -382,33 +386,45 @@ class Interpz3d:
         if not _has_import_f90interpz:
             raise ModuleNotFoundError("The fortran modules haven't been compiled.")
         
-        self.zdata = _convert_dtype(zdata, 'float64')
-        self.level = np.array(level, dtype='float64')
+        self._dtype = zdata.dtype
+        self.zdata = zdata
+        self.level = np.array(level, dtype=self._dtype)
         self.missing_value = missing_value
         self._nz = zdata.shape[0]
         
+        # the used functions depend on `levels` (single or multiple) and float precision (single or double)
         if isinstance(level, (int, float, np.integer, np.floating)):
-            find_level_func = find_level_1
-            find_weight_func = calc_weights_1
-            self._interpz3d_func = interpz3d_1
-            
+            postfix1 = '1'
         elif isinstance(level, (tuple, list, np.ndarray)):
-            find_level_func = find_level_n
-            find_weight_func = calc_weights_n
-            self._interpz3d_func = interpz3d_n
-            
+            postfix1 = 'n'
         else:
             raise ValueError(f"Unavailable `level` type : {type(level)}")
+        
+        if self._dtype == 'float32':
+            self._is_convert_dtype = False
+            postfix2 = 'r32'
+        elif self._dtype == 'float64':
+            self._is_convert_dtype = False
+            postfix2 = 'r64'
+        else:
+            self._is_convert_dtype = True
+            self.zdata = self.zdata.astype(np.float32)
+            postdix2 = 'r32'
             
-        # find level index and weight
+        postfix = f'{postfix1}_{postfix2}'
+        find_level_func = getattr(f90intp, f'find_level_{postfix}')
+        find_weight_func = getattr(f90intp, f'calc_weights_{postfix}')
+        self._interpz3d_func = getattr(f90intp, f'interpz3d_{postfix}')
+        
+        # find level index and weights
         zdata_f = np.asfortranarray(zdata.T)
         lev_idx = find_level_func(zdata_f, level)    # (nx, ny, nlev)
-        weight = find_weight_func(zdata_f, level, lev_idx)    # (nx, ny, nlev)
+        weight = find_weight_func(zdata_f, level, lev_idx)   # (nx, ny, nlev)
         
         self._zdata_f = zdata_f
         self._lev_idx = lev_idx
         self._weight = weight
-    
+
     def interp(self, *var):
         """
         Interpolate variable from the original vertical coordinate to `zdata` coordinate.
@@ -425,6 +441,7 @@ class Interpz3d:
         If len(var) > 1:
             List of interpolated variables. List[Array_3d], shape of each array = (nlev, ny, nx)
         """
+        dtype = self._dtype
         nz = self._nz
         lev_idx = self._lev_idx
         weight = self._weight
@@ -433,7 +450,10 @@ class Interpz3d:
         missing_value = self.missing_value
         
         if len(var) == 1:
-            v = _convert_dtype(var[0], 'float64')
+            if self._is_convert_dtype:
+                v = _convert_dtype(var[0], dtype)
+            else:
+                v = var[0]
             
             if v.shape != self.zdata.shape:
                 raise ValueError("The shape of input array should be equal to `zdata`.")
@@ -447,7 +467,8 @@ class Interpz3d:
             var_interp = []
         
             for v in var:
-                v = _convert_dtype(v, 'float64')
+                if self._is_convert_dtype:
+                    v = _convert_dtype(v, dtype)
                 
                 if v.shape != self.zdata.shape:
                     raise ValueError("The shape of input array should be equal to `zdata`.")

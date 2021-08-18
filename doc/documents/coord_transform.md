@@ -159,7 +159,10 @@ class <span style="color:#a77864">**Interpz3d**</span>
     
     Note
     ----
-    The performance will be further better if the data types of all numpy array are `np.float64`.
+    The performance will be better if the data types of numpy arrays are all `np.float32`
+    or all `np.float64`.
+    If the types of arrays are not all identical, or the types are not `np.float32` or
+    `np.float64`, implicitly type conversion is needed and the performance will be affected.
     
     Example
     -------
