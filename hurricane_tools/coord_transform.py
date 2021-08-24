@@ -160,6 +160,7 @@ class XY2RT:
     def _prepare_xy2rt_griddata(self, lon, lat, clon, clat, radius, theta, dxdy):
         """return a function to perform interpolation by griddata method"""
         dx, dy = dxdy
+        ny, nx = lon.shape
         nrad = radius.size
         nthe = theta.size
 
@@ -176,8 +177,14 @@ class XY2RT:
         max_rad = radius.max()
         L_lon = int(max_rad // dx) + 6
         L_lat = int(max_rad // dy) + 6
+        
         cix = np.unravel_index(dist_full.argmin(), dist_full.shape)  # (nearly) center index
-        box_slice = (slice(cix[0]-L_lat, cix[0]+L_lat), slice(cix[1]-L_lon, cix[1]+L_lon))
+        lowery = cix[0] - L_lat if (cix[0] - L_lat > 0) else 0
+        uppery = cix[0] + L_lat if (cix[0] + L_lat < ny) else ny
+        lowerx = cix[1] - L_lon if (cix[1] - L_lon > 0) else 0
+        upperx = cix[1] + L_lon if (cix[1] + L_lon > nx) else nx
+        
+        box_slice = (slice(lowery, uppery), slice(lowerx, upperx))
         dist_lon_b = dist_lon[box_slice]
         dist_lat_b = dist_lat[box_slice]
 

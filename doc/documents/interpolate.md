@@ -88,11 +88,11 @@ class <span style="color:#a77864">**FastGriddata**</span>
         
         Parameter
         ---------
-        values : 2-d array, shape = (n, 2)
+        values : 1-d array, shape = (n,)
         
         Return
         ------
-        2-d array, shape = (m, 2)
+        1-d array, shape = (m,)
 
   
 ******
