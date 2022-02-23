@@ -15,21 +15,23 @@ For example:
 
 I only test it in Linux environment.  
 This package depends on the following packages:
-* numpy
-* scipy
-* matplotlib
-* pandas
-* netCDF4
-* requests
+* numpy (1.19.5)
+* scipy (1.4.1)
+* matplotlib (3.3.1)
+* pandas (1.0.3)
+* netCDF4 (1.5.3)
+* requests (2.14.2)  
+
+The versions in the parentheses are which I developed and tested. It may works well under different versions if these packages are not changed drastically.
 
 
 ## Installation
 
-It can be download by
+It can be downloaded by
 
     $ git clone https://github.com/CYehLu/hurricane_tools.git
     
-then install it by pip
+and installed by pip
 
     $ pip install -e ./hurricane_tools
     
@@ -49,7 +51,7 @@ It can be compiled by the following steps:
     $ cd hurricane_tools/hurricane_tools/fortran
     $ make
     
-It will generate 7 `*.so` files if the compilation is successful. Note that I only test it with `gfortran` compiler.  
+It will generate seven `*.so` files if the compilation is successful. Note that I only test it with `gfortran` compiler.  
 
 
 ## Documents
