@@ -3,7 +3,7 @@ from scipy.spatial import qhull
 
 
 __all__ = [
-    'FastGridata'
+    'FastGriddata'
 ]
 
 

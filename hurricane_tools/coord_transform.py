@@ -7,28 +7,28 @@ from .interpolate import FastGriddata
 
 try:
     from .fortran.f90xy2rt import xy2rt as f90xy2rt
-    _has_import_f90xy2rt = True
+    _HAS_IMPORT_F90XYRT = True
 except ModuleNotFoundError:
-    _has_import_f90xy2rt = False
+    _HAS_IMPORT_F90XYRT = False
     
 try:
     from .fortran.f90rt2xy import rt2xy as f90rt2xy
-    _has_import_f90rt2xy = True
+    _HAS_IMPORT_F90RT2XY = True
 except ModuleNotFoundError:
-    _has_import_f90rt2xy = False
+    _HAS_IMPORT_F90RT2XY = False
 
 try:
     from .fortran.f90interpz import mod_interpz as f90intp
     #from .fortran.f90interpz import find_level_1, find_level_n, calc_weights_1, calc_weights_n, interpz3d_1, interpz3d_n
-    _has_import_f90interpz = True
+    _HAS_IMPORT_F90INTERPZ = True
 except ModuleNotFoundError:
-    _has_import_f90interpz = False
+    _HAS_IMPORT_F90INTERPZ = False
 
 
 __all__ = [
     'XY2RT',
     'RT2XY',
-    'Interpz3D'
+    'Interpz3d'
 ]
 
 
@@ -132,7 +132,7 @@ class XY2RT:
         else:
             raise ValueError("`intp` must be None, 'griddata' or 'fortran'.")
             
-        if (self._intp == 'fortran') and (not _has_import_f90xy2rt):
+        if (self._intp == 'fortran') and (not _HAS_IMPORT_F90XYRT):
             raise ModuleNotFoundError("The Fortran modules haven't been compiled.")
             
         if self._intp == 'griddata':
@@ -294,7 +294,7 @@ class RT2XY:
         else:
             raise ValueError("`intp` must be None, 'griddata' or 'fortran'.")
             
-        if (self._intp == 'fortran') and (not _has_import_f90xy2rt):
+        if (self._intp == 'fortran') and (not _HAS_IMPORT_F90XYRT):
             raise ModuleNotFoundError("The Fortran modules haven't been compiled.")
             
         if self._intp == 'griddata':
@@ -390,7 +390,7 @@ class Interpz3d:
         missing_value : scalar, optional
             Assign missing value. Default is `np.nan`
         """     
-        if not _has_import_f90interpz:
+        if not _HAS_IMPORT_F90INTERPZ:
             raise ModuleNotFoundError("The fortran modules haven't been compiled.")
         
         self._dtype = zdata.dtype
