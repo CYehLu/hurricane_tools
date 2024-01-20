@@ -113,29 +113,32 @@ def willoughby04(r, vmax, rmax, n, X1, X2, A, twidth):
         J. Atmos. Sci., 67, 3806-3822
         http://journals.ametsoc.org/doi/pdf/10.1175/2010JAS3444.1
     """
-    raise ValueError('Unfinish')
-    
-    # determine `R1` and `R2`
-    w_func = lambda xi: 126 * xi**5 - 480 * xi**6 + 540 * xi**7 - 315 * xi**8 + 70 * xi**9
-    target = n * ((1-A) * X1 + A * X2) / (n * ((1-A) * X1 + A * X2) + rmax)
-    target_func = lambda xi: w_func(xi) - target
-    xi0 = root(target_func, 0.5).x
-    R1 = rmax - xi0 * twidth
-    R2 = R1 + twidth
-    
-    idx_i = r <= R1    # inner area
-    idx_o = r >= R2    # outer area
-    idx_t = (r > R1) & (r < R2)    # transition area
-    
-    vi_func = lambda r: vmax * (r / rmax)**n
-    vo_func = lambda r: vmax * ( (1-A) * np.exp(-(r-rmax)/X1) + A * np.exp(-(r-rmax)/X2) )
-    
-    v = np.empty_like(r)
-    v[idx_i] = vi_func(r[idx_i])
-    v[idx_o] = vo_func(r[idx_o])
-    
-    xi = (r[idx_t] - R1) / (R2 - R1)
-    w = w_func(xi)
-    v[idx_t] = vi_func(r[idx_t]) * (1-w) + vo_func(r[idx_t]) * w
-    
-    return v
+    FINISHED = False
+
+    if not FINISHED:
+        raise NotImplementedError("Unfinish")
+    else:
+        # determine `R1` and `R2`
+        w_func = lambda xi: 126 * xi**5 - 480 * xi**6 + 540 * xi**7 - 315 * xi**8 + 70 * xi**9
+        target = n * ((1-A) * X1 + A * X2) / (n * ((1-A) * X1 + A * X2) + rmax)
+        target_func = lambda xi: w_func(xi) - target
+        xi0 = root(target_func, 0.5).x
+        R1 = rmax - xi0 * twidth
+        R2 = R1 + twidth
+        
+        idx_i = r <= R1    # inner area
+        idx_o = r >= R2    # outer area
+        idx_t = (r > R1) & (r < R2)    # transition area
+        
+        vi_func = lambda r: vmax * (r / rmax)**n
+        vo_func = lambda r: vmax * ( (1-A) * np.exp(-(r-rmax)/X1) + A * np.exp(-(r-rmax)/X2) )
+        
+        v = np.empty_like(r)
+        v[idx_i] = vi_func(r[idx_i])
+        v[idx_o] = vo_func(r[idx_o])
+        
+        xi = (r[idx_t] - R1) / (R2 - R1)
+        w = w_func(xi)
+        v[idx_t] = vi_func(r[idx_t]) * (1-w) + vo_func(r[idx_t]) * w
+        
+        return v
