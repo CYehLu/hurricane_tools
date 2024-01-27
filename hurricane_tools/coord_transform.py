@@ -5,24 +5,27 @@ from .distance import latlon2distance
 from .pseudo_coord import lonlat2xy
 from .interpolate import FastGriddata
 
+_HAS_IMPORT_F90XYRT = False
+_HAS_IMPORT_F90RT2XY = False
+_HAS_IMPORT_F90INTERPZ = False
+
 try:
     from .fortran.f90xy2rt import xy2rt as f90xy2rt
     _HAS_IMPORT_F90XYRT = True
 except ModuleNotFoundError:
-    _HAS_IMPORT_F90XYRT = False
+    pass
     
 try:
     from .fortran.f90rt2xy import rt2xy as f90rt2xy
     _HAS_IMPORT_F90RT2XY = True
 except ModuleNotFoundError:
-    _HAS_IMPORT_F90RT2XY = False
+    pass
 
 try:
     from .fortran.f90interpz import mod_interpz as f90intp
-    #from .fortran.f90interpz import find_level_1, find_level_n, calc_weights_1, calc_weights_n, interpz3d_1, interpz3d_n
     _HAS_IMPORT_F90INTERPZ = True
 except ModuleNotFoundError:
-    _HAS_IMPORT_F90INTERPZ = False
+    pass
 
 
 __all__ = [

@@ -3,10 +3,16 @@ import numpy as np
 import pandas as pd
 from netCDF4 import Dataset, MFDataset
 
-from .fortran.f90tk import calc_tk
-from .fortran.f90slp import dcomputeseaprs, dcomputeseaprs_nt
-from .fortran.f90dbz import calcdbz, calcdbz_nt
-from .fortran.f90vort import dcomputeabsvort, dcomputepv, dcomputeabsvort_nt, dcomputepv_nt
+_HAS_IMPORT_F90GETVAR = False
+
+try:
+    from .fortran.f90tk import calc_tk
+    from .fortran.f90slp import dcomputeseaprs, dcomputeseaprs_nt
+    from .fortran.f90dbz import calcdbz, calcdbz_nt
+    from .fortran.f90vort import dcomputeabsvort, dcomputepv, dcomputeabsvort_nt, dcomputepv_nt
+    _HAS_IMPORT_F90GETVAR = True
+except ModuleNotFoundError:
+    pass
 
 
 __all__ = [
@@ -70,6 +76,9 @@ class GetVar:
             The time index of variables.
             Default is None, and it would use `slice(0, None)`, the all time index.
         """
+        if not _HAS_IMPORT_F90GETVAR:
+            raise ModuleNotFoundError("The Fortran modules should be compiled before using it.")
+
         self.variables = {}
         self.filename = filename
         self.ncfile = Dataset(filename)
