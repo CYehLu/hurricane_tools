@@ -5,7 +5,7 @@ from scipy.optimize import root
 __all__ = [
     'rankine_vortex',
     'holland80',
-    'willoughby04'
+    'willoughby06'
 ]
 
 
@@ -98,47 +98,97 @@ def holland80(r, pc, pn, A, B, rho=None, f=None):
     return v
 
 
-def willoughby04(r, vmax, rmax, n, X1, X2, A, twidth):
+def _rhs(r1, rmw=None, transition_width=None):
+    xi = (rmw - r1) / transition_width
+    if xi <= 0:
+        return 0
+    elif xi >= 1:
+        return 1
+    else:
+        return 126*xi**5 - 420*xi**6 + 540*xi**7 - 315*xi**8 + 70*xi**9
+    
+def _vt(r, vmax, rmw, r1, r2, n, x1, x2, a):
+    v_inner = lambda r: vmax * (r/rmw)**n
+    v_outer = lambda r: vmax * ((1-a)*np.exp(-(r-rmw)/x1) + a*np.exp(-(r-rmw)/x2))
+
+    if isinstance(r, (int, float)):
+        r = np.array([r])
+    elif isinstance(r, (list, tuple)):
+        r = np.array(r)
+    elif isinstance(r, np.ndarray):
+        pass
+
+    inner_idx = (r >= 0) & (r <= r1)
+    trans_idx = (r > r1) & (r < r2)
+    outer_idx = r >= r2
+
+    result = np.empty_like(r)
+    result[inner_idx] = v_inner(r[inner_idx])
+    result[outer_idx] = v_outer(r[outer_idx])
+
+    xi = (r - r1) / (r2 - r1)
+    w = 126*xi**5 - 420*xi**6 + 540*xi**7 - 315*xi**8 + 70*xi**9
+    result[trans_idx] = (1-w[trans_idx]) * v_inner(r[trans_idx]) + w[trans_idx] * v_outer(r[trans_idx])
+    
+    return result 
+
+def willoughby06(r, vmax, rmw, trans_width, n, decay_length1, decay_length2=None, proportion=None):
     """
     The empirical formula of TC axisymmetric structure by Willoughby (2006).
+
+    Parameters
+    ----------
+    r :  scalar, 1-d array-like or 2-d array-like
+        Radius to TC center
+    vmax : scalar
+        Maximum tangential wind speed
+    rmw : scalar
+        Radius of maximum wind
+    trans_width : scalar
+        Transition width between inner and outer vortex
+    n : scalar
+        Exponent for the power law inside the eye
+    decay_length1 : scalar
+        The first exponential decay length in the outer vortex
+    decay_length2 : scalar, optional
+        The second exponential decay length in the outer vortex
+    proportion : scalar, optional
+        The mix proportion of decay_length1 and decay_length in the outer vortex
+
+    Return
+    ------
+    Vt : scalar, 1-d array-like or 2-d array-like
+        Tangential wind speed.
+
+    Note
+    ----
+    If `proportion` is 0, it would decay to single-exponential profile.
     
     Reference
     ---------
     [1] H. E. Willoughby, R. W. R. Darling, M. E. Rahn, "Parametric Representation of the Primary 
         Hurricane Vortex. Part II: A New Family of Sectionally Continuous Profiles"
         Mon. Wea. Rev., 134, 1102-1120
-        https://reurl.cc/Kk1EMM
-    [2] Wu, C.-C., G.-Y. Lien, J.-H. Chen, and F. Zhang, "Assimilation of tropical cyclone track 
-        and structure based on the Ensemble Kalman Filter (EnKF)"
-        J. Atmos. Sci., 67, 3806-3822
-        http://journals.ametsoc.org/doi/pdf/10.1175/2010JAS3444.1
+        https://journals.ametsoc.org/view/journals/mwre/134/4/mwr3106.1.xml
     """
-    FINISHED = False
+    if decay_length2 is None:
+        decay_length2 = 1
+    if proportion is None:
+        proportion = 0
+    
+    # symbols used in the paper
+    a = proportion
+    x1 = decay_length1
+    x2 = decay_length2
 
-    if not FINISHED:
-        raise NotImplementedError("Unfinish")
-    else:
-        # determine `R1` and `R2`
-        w_func = lambda xi: 126 * xi**5 - 480 * xi**6 + 540 * xi**7 - 315 * xi**8 + 70 * xi**9
-        target = n * ((1-A) * X1 + A * X2) / (n * ((1-A) * X1 + A * X2) + rmax)
-        target_func = lambda xi: w_func(xi) - target
-        xi0 = root(target_func, 0.5).x
-        R1 = rmax - xi0 * twidth
-        R2 = R1 + twidth
-        
-        idx_i = r <= R1    # inner area
-        idx_o = r >= R2    # outer area
-        idx_t = (r > R1) & (r < R2)    # transition area
-        
-        vi_func = lambda r: vmax * (r / rmax)**n
-        vo_func = lambda r: vmax * ( (1-A) * np.exp(-(r-rmax)/X1) + A * np.exp(-(r-rmax)/X2) )
-        
-        v = np.empty_like(r)
-        v[idx_i] = vi_func(r[idx_i])
-        v[idx_o] = vo_func(r[idx_o])
-        
-        xi = (r[idx_t] - R1) / (R2 - R1)
-        w = w_func(xi)
-        v[idx_t] = vi_func(r[idx_t]) * (1-w) + vo_func(r[idx_t]) * w
-        
-        return v
+    lhs = (n*(1-a)*x1 + n*a*x2) / (n*(1-a)*x1 + n*a*x2 + rmw)
+    f = lambda r1: lhs - _rhs(r1, rmw, trans_width)
+    res = root(f, x0=rmw-trans_width/2)  # the initial value is chosen to make xi(r=rmw) be 1/2
+
+    if not res.success:
+        raise ValueError("Solve Fail")
+    
+    r1 = res.x
+    r2 = trans_width + r1
+    v = _vt(r, vmax, rmw, r1, r2, n, x1, x2, a)
+    return v 
