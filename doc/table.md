@@ -10,7 +10,7 @@ axisym_vortex
 | :--------------- | :---------- |
 | <font color="#a77864"> **rankine_vortex** </font> | Classic rankine vortex. |
 | <font color="#a77864"> **holland80** </font> | The empirical formula of TC axisymmetric structure by Holland (1980). |
-| <font color="#a77864"> **willoughby04** </font> | The empirical formula of TC axisymmetric structure by Willoughby (2006). |
+| <font color="#a77864"> **willoughby06** </font> | The empirical formula of TC axisymmetric structure by Willoughby (2006). |
 
 
 ******

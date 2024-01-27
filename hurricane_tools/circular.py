@@ -256,7 +256,7 @@ class Axisymmetricity:
             Spatial resolution, (dx, dy). Unit is km.
             Default is None, and it would be automatically derived based on `lon` and `lat`.
         integ: str, {'trapz', 'simps'}. Optional
-            Numerical integration method. 'trapz' is trapezoidal method, and `simps` is Simpson’s
+            Numerical integration method. 'trapz' is trapezoidal method, and `simps` is Simpson's
             method. Default is 'trapz'.
             See scipy documents for these two methods: https://reurl.cc/X6KpYD
         intp: str, 'griddata' or 'fortran'. Optional

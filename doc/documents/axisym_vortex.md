@@ -7,8 +7,8 @@
     Classic rankine vortex.
     
     V(r) = |- Vmax * (r / Rmax) ,       if r <= Rmax
-           |- Vmax * (r / Rmax)**(-Î±) , if r > Rmax
-    in the classic case, Î± = 1.
+           |- Vmax * (r / Rmax)**(-£\) , if r > Rmax
+    in the classic case, £\ = 1.
     
     Parameters
     ----------
@@ -60,26 +60,50 @@
     Reference
     ---------
     [1] G. J. Holland, "An Analytic Model of the Wind and Pressure Profiles in Hurricanes"
-        Mon. Wea. Rev., 108, 1212â€“1218
+        Mon. Wea. Rev., 108, 1212¡V1218
         https://reurl.cc/D9rbZd
 
 
 
 ******
-<span style="color:#a77864">**willoughby04**</span>**(r, vmax, rmax, n, X1, X2, A, twidth)**
+<span style="color:#a77864">**willoughby06**</span>**(r, vmax, rmw, trans_width, n, decay_length1, decay_length2=None, proportion=None)**
 
     The empirical formula of TC axisymmetric structure by Willoughby (2006).
+
+    Parameters
+    ----------
+    r :  scalar, 1-d array-like or 2-d array-like
+        Radius to TC center
+    vmax : scalar
+        Maximum tangential wind speed
+    rmw : scalar
+        Radius of maximum wind
+    trans_width : scalar
+        Transition width between inner and outer vortex
+    n : scalar
+        Exponent for the power law inside the eye
+    decay_length1 : scalar
+        The first exponential decay length in the outer vortex
+    decay_length2 : scalar, optional
+        The second exponential decay length in the outer vortex
+    proportion : scalar, optional
+        The mix proportion of decay_length1 and decay_length in the outer vortex
+
+    Return
+    ------
+    Vt : scalar, 1-d array-like or 2-d array-like
+        Tangential wind speed.
+
+    Note
+    ----
+    If `proportion` is 0, it would decay to single-exponential profile.
     
     Reference
     ---------
     [1] H. E. Willoughby, R. W. R. Darling, M. E. Rahn, "Parametric Representation of the Primary 
         Hurricane Vortex. Part II: A New Family of Sectionally Continuous Profiles"
         Mon. Wea. Rev., 134, 1102-1120
-        https://reurl.cc/Kk1EMM
-    [2] Wu, C.-C., G.-Y. Lien, J.-H. Chen, and F. Zhang, "Assimilation of tropical cyclone track 
-        and structure based on the Ensemble Kalman Filter (EnKF)"
-        J. Atmos. Sci., 67, 3806-3822
-        http://journals.ametsoc.org/doi/pdf/10.1175/2010JAS3444.1
+        https://journals.ametsoc.org/view/journals/mwre/134/4/mwr3106.1.xml
 
 
 

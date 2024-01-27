@@ -244,7 +244,7 @@ def parse_module(file_path):
     ###     )
     ### }
     
-    with open(file_path) as pyf:
+    with open(file_path, encoding='utf-8') as pyf:
         content = pyf.readlines()
         
     i = 0
